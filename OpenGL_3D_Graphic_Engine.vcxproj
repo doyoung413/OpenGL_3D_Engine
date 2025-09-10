@@ -103,7 +103,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)libs\SDL3\include;$(SolutionDir)libs\GLEW\include;$(SolutionDir)libs\GLM;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libs\SDL3\include;$(SolutionDir)libs\GLEW\include;$(SolutionDir)libs\GLM;$(SolutionDir)graphic\include;$(SolutionDir)engine\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -126,7 +126,7 @@ copy "$(ProjectDir)\libs\GLEW\bin\Release\x64\glew32.dll" "$(OutDir)" </Command>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)libs\SDL3\include;$(SolutionDir)libs\GLEW\include;$(SolutionDir)libs\GLM;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libs\SDL3\include;$(SolutionDir)libs\GLEW\include;$(SolutionDir)libs\GLM;$(SolutionDir)graphic\include;$(SolutionDir)engine\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -141,7 +141,15 @@ copy "$(ProjectDir)\libs\GLEW\bin\Release\x64\glew32.dll" "$(OutDir)" </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="graphic\source\IndexBuffer.cpp" />
+    <ClCompile Include="graphic\source\VertexArray.cpp" />
+    <ClCompile Include="graphic\source\VertexBuffer.cpp" />
     <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="graphic\include\IndexBuffer.hpp" />
+    <ClInclude Include="graphic\include\VertexArray.hpp" />
+    <ClInclude Include="graphic\include\VertexBuffer.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
