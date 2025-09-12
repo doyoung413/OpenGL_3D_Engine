@@ -13,6 +13,26 @@ IndexBuffer::~IndexBuffer()
 	glDeleteBuffers(1, &indicesHandle);
 }
 
+IndexBuffer::IndexBuffer(IndexBuffer&& other) noexcept
+    : indicesHandle(other.indicesHandle), count(other.count)
+{
+    other.indicesHandle = 0;
+    other.count = 0;
+}
+
+IndexBuffer& IndexBuffer::operator=(IndexBuffer&& other) noexcept
+{
+    if (this != &other)
+    {
+        glDeleteBuffers(1, &indicesHandle);
+        indicesHandle = other.indicesHandle;
+        count = other.count;
+        other.indicesHandle = 0;
+        other.count = 0;
+    }
+    return *this;
+}
+
 void IndexBuffer::Bind()
 {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesHandle);

@@ -8,6 +8,12 @@ public:
 	IndexBuffer(std::span<const unsigned int> indices);
 	~IndexBuffer();
 
+	IndexBuffer(const IndexBuffer&) = delete;
+	IndexBuffer& operator=(const IndexBuffer&) = delete;
+
+	IndexBuffer(IndexBuffer&& other) noexcept;
+	IndexBuffer& operator=(IndexBuffer&& other) noexcept;
+
 	void Bind();
 	void UnBind();
 

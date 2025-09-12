@@ -15,6 +15,12 @@ public:
 	}
 	~VertexBuffer();
 
+	VertexBuffer(const VertexBuffer&) = delete;
+	VertexBuffer& operator=(const VertexBuffer&) = delete;
+
+	VertexBuffer(VertexBuffer&& other) noexcept;
+	VertexBuffer& operator=(VertexBuffer&& other) noexcept;
+
 	void Bind();
 	void UnBind();
 

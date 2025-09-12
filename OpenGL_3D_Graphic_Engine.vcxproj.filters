@@ -30,6 +30,9 @@
     <ClCompile Include="graphic\source\IndexBuffer.cpp">
       <Filter>Source Files\Graphic</Filter>
     </ClCompile>
+    <ClCompile Include="graphic\source\Texture.cpp">
+      <Filter>Source Files\Graphic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphic\include\IndexBuffer.hpp">
@@ -39,6 +42,9 @@
       <Filter>Source Files\Graphic</Filter>
     </ClInclude>
     <ClInclude Include="graphic\include\VertexBuffer.hpp">
+      <Filter>Source Files\Graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="graphic\include\Texture.hpp">
       <Filter>Source Files\Graphic</Filter>
     </ClInclude>
   </ItemGroup>
