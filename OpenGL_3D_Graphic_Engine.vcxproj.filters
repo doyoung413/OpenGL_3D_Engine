@@ -16,6 +16,24 @@
     <Filter Include="Source Files\Graphic">
       <UniqueIdentifier>{399f813b-0160-49c1-b9ce-848e4ece51cc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Engine">
+      <UniqueIdentifier>{25ab133e-7a8b-484e-aa74-aab40666a9b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Object">
+      <UniqueIdentifier>{8f84c37d-efd3-4f52-8a62-e5faa9257b3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Component">
+      <UniqueIdentifier>{b92ad0c1-2b1e-41d6-999f-25afbb357004}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Scene">
+      <UniqueIdentifier>{2e0cc6e5-17ea-4234-b329-d76ebbeecc9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Managers">
+      <UniqueIdentifier>{942cf817-b4f6-4178-9459-59a4a2f8b371}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Demo">
+      <UniqueIdentifier>{300b7f23-24be-4f57-ba35-03685fcd75f8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -33,6 +51,36 @@
     <ClCompile Include="graphic\source\Texture.cpp">
       <Filter>Source Files\Graphic</Filter>
     </ClCompile>
+    <ClCompile Include="engine\source\Object.cpp">
+      <Filter>Source Files\Engine\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="graphic\source\Shader.cpp">
+      <Filter>Source Files\Graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\source\MeshRenderer.cpp">
+      <Filter>Source Files\Engine\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="graphic\source\Mesh.cpp">
+      <Filter>Source Files\Graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\source\InputManager.cpp">
+      <Filter>Source Files\Engine\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\source\ObjectManager.cpp">
+      <Filter>Source Files\Engine\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\source\RenderManager.cpp">
+      <Filter>Source Files\Engine\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\source\SceneManager.cpp">
+      <Filter>Source Files\Engine\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="demo\source\MeshesScene.cpp">
+      <Filter>Source Files\Demo</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\source\Engine.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphic\include\IndexBuffer.hpp">
@@ -46,6 +94,57 @@
     </ClInclude>
     <ClInclude Include="graphic\include\Texture.hpp">
       <Filter>Source Files\Graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\Object.hpp">
+      <Filter>Source Files\Engine\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\Transform.hpp">
+      <Filter>Source Files\Engine\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\Component.hpp">
+      <Filter>Source Files\Engine\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\ComponentTypes.hpp">
+      <Filter>Source Files\Engine\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="graphic\include\Shader.hpp">
+      <Filter>Source Files\Graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\MeshRenderer.hpp">
+      <Filter>Source Files\Engine\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="graphic\include\Mesh.hpp">
+      <Filter>Source Files\Graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\SceneTag.hpp">
+      <Filter>Source Files\Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\Scene.hpp">
+      <Filter>Source Files\Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\InputManager.hpp">
+      <Filter>Source Files\Engine\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\ObjectManager.hpp">
+      <Filter>Source Files\Engine\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\RenderManager.hpp">
+      <Filter>Source Files\Engine\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\SceneManager.hpp">
+      <Filter>Source Files\Engine\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="demo\include\MeshesScene.hpp">
+      <Filter>Source Files\Demo</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\ObjectType.hpp">
+      <Filter>Source Files\Engine\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\Engine.hpp">
+      <Filter>Source Files\Engine</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

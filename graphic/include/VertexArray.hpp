@@ -15,21 +15,10 @@ struct GLVertexArrayAttribFormat
 	GLsizei stride = 0;
 };
 
-enum class PrimitivePattern
-{
-	POINT = GL_POINTS,
-	LINE = GL_LINES,
-	LINELOOP = GL_LINE_LOOP,
-	LINESTRIP = GL_LINE_STRIP,
-	TRIANGLE = GL_TRIANGLES,
-	TRIANGLESTRIP = GL_TRIANGLE_STRIP,
-	TRIANGLEFAN = GL_TRIANGLE_FAN,
-};
-
 class VertexArray
 {
 public:
-	VertexArray(PrimitivePattern pattern_ = PrimitivePattern::TRIANGLE);
+	VertexArray();
 	~VertexArray();
 
 	void Bind();
@@ -43,9 +32,7 @@ public:
 	IndexBuffer& GetIndexBuffer() { return indexBuffer; }
 	GLsizei GetIndicesCount() const noexcept { return numIndices; }
 	GLsizei GetVertexCount() const { return numVertices; }
-	PrimitivePattern GetPrimitivePattern() const { return pattern; }
-
-	void SetPrimitivePattern(PrimitivePattern primitivePattern) { pattern = primitivePattern; }
+	
 	void SetVertexCount(int count) { numVertices = count; }
 private:
 	std::vector<VertexBuffer> vertexBuffers;
@@ -53,6 +40,4 @@ private:
 	GLsizei                   numVertices = 0;
 	GLsizei                   numIndices = 0;
 	GLuint					  arrayHandle = 0;
-
-	PrimitivePattern         pattern = PrimitivePattern::TRIANGLE;
 };

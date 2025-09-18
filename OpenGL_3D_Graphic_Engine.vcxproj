@@ -103,7 +103,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)libs\SDL3\include;$(SolutionDir)libs\GLEW\include;$(SolutionDir)libs\GLM;$(SolutionDir)libs\STBI;$(SolutionDir)graphic\include;$(SolutionDir)engine\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libs\SDL3\include;$(SolutionDir)libs\GLEW\include;$(SolutionDir)libs\GLM;$(SolutionDir)libs\STBI;$(SolutionDir)graphic\include;$(SolutionDir)engine\include;$(SolutionDir)demo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -126,7 +126,7 @@ copy "$(ProjectDir)\libs\GLEW\bin\Release\x64\glew32.dll" "$(OutDir)" </Command>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)libs\SDL3\include;$(SolutionDir)libs\GLEW\include;$(SolutionDir)libs\GLM;$(SolutionDir)libs\STBI;$(SolutionDir)graphic\include;$(SolutionDir)engine\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libs\SDL3\include;$(SolutionDir)libs\GLEW\include;$(SolutionDir)libs\GLM;$(SolutionDir)libs\STBI;$(SolutionDir)graphic\include;$(SolutionDir)engine\include;$(SolutionDir)demo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -141,17 +141,44 @@ copy "$(ProjectDir)\libs\GLEW\bin\Release\x64\glew32.dll" "$(OutDir)" </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="demo\source\MeshesScene.cpp" />
+    <ClCompile Include="engine\source\Engine.cpp" />
+    <ClCompile Include="engine\source\InputManager.cpp" />
+    <ClCompile Include="engine\source\MeshRenderer.cpp" />
+    <ClCompile Include="engine\source\Object.cpp" />
+    <ClCompile Include="engine\source\ObjectManager.cpp" />
+    <ClCompile Include="engine\source\RenderManager.cpp" />
+    <ClCompile Include="engine\source\SceneManager.cpp" />
     <ClCompile Include="graphic\source\IndexBuffer.cpp" />
+    <ClCompile Include="graphic\source\Mesh.cpp" />
+    <ClCompile Include="graphic\source\Shader.cpp" />
     <ClCompile Include="graphic\source\Texture.cpp" />
     <ClCompile Include="graphic\source\VertexArray.cpp" />
     <ClCompile Include="graphic\source\VertexBuffer.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="demo\include\MeshesScene.hpp" />
+    <ClInclude Include="engine\include\Component.hpp" />
+    <ClInclude Include="engine\include\ComponentTypes.hpp" />
+    <ClInclude Include="engine\include\Engine.hpp" />
+    <ClInclude Include="engine\include\InputManager.hpp" />
+    <ClInclude Include="engine\include\MeshRenderer.hpp" />
+    <ClInclude Include="engine\include\Object.hpp" />
+    <ClInclude Include="engine\include\ObjectManager.hpp" />
+    <ClInclude Include="engine\include\ObjectType.hpp" />
+    <ClInclude Include="engine\include\RenderManager.hpp" />
+    <ClInclude Include="engine\include\Scene.hpp" />
+    <ClInclude Include="engine\include\SceneManager.hpp" />
+    <ClInclude Include="engine\include\SceneTag.hpp" />
+    <ClInclude Include="engine\include\Transform.hpp" />
     <ClInclude Include="graphic\include\IndexBuffer.hpp" />
+    <ClInclude Include="graphic\include\Mesh.hpp" />
+    <ClInclude Include="graphic\include\Shader.hpp" />
     <ClInclude Include="graphic\include\Texture.hpp" />
     <ClInclude Include="graphic\include\VertexArray.hpp" />
     <ClInclude Include="graphic\include\VertexBuffer.hpp" />
+    <ClInclude Include="main.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

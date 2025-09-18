@@ -2,7 +2,7 @@
 #include <glew.h>
 
 IndexBuffer::IndexBuffer(std::span<const unsigned int> indices)
-	: count(indices.size())
+	: count(static_cast<int>(indices.size()))
 {
 	glCreateBuffers(1, &indicesHandle);
 	glNamedBufferStorage(indicesHandle, indices.size_bytes(), indices.data(), GL_DYNAMIC_STORAGE_BIT);

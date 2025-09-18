@@ -1,8 +1,7 @@
 #include "VertexArray.hpp"
 
-VertexArray::VertexArray(PrimitivePattern pattern_)
+VertexArray::VertexArray()
 {
-	pattern = pattern_;
 	glCreateVertexArrays(1, &arrayHandle);
 }
 
