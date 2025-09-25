@@ -142,6 +142,7 @@ copy "$(ProjectDir)\libs\GLEW\bin\Release\x64\glew32.dll" "$(OutDir)" </Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="demo\source\MeshesScene.cpp" />
+    <ClCompile Include="engine\source\CameraManager.cpp" />
     <ClCompile Include="engine\source\Engine.cpp" />
     <ClCompile Include="engine\source\InputManager.cpp" />
     <ClCompile Include="engine\source\MeshRenderer.cpp" />
@@ -149,6 +150,7 @@ copy "$(ProjectDir)\libs\GLEW\bin\Release\x64\glew32.dll" "$(OutDir)" </Command>
     <ClCompile Include="engine\source\ObjectManager.cpp" />
     <ClCompile Include="engine\source\RenderManager.cpp" />
     <ClCompile Include="engine\source\SceneManager.cpp" />
+    <ClCompile Include="graphic\source\Camera.cpp" />
     <ClCompile Include="graphic\source\IndexBuffer.cpp" />
     <ClCompile Include="graphic\source\Mesh.cpp" />
     <ClCompile Include="graphic\source\Shader.cpp" />
@@ -159,6 +161,7 @@ copy "$(ProjectDir)\libs\GLEW\bin\Release\x64\glew32.dll" "$(OutDir)" </Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="demo\include\MeshesScene.hpp" />
+    <ClInclude Include="engine\include\CameraManager.hpp" />
     <ClInclude Include="engine\include\Component.hpp" />
     <ClInclude Include="engine\include\ComponentTypes.hpp" />
     <ClInclude Include="engine\include\Engine.hpp" />
@@ -172,6 +175,7 @@ copy "$(ProjectDir)\libs\GLEW\bin\Release\x64\glew32.dll" "$(OutDir)" </Command>
     <ClInclude Include="engine\include\SceneManager.hpp" />
     <ClInclude Include="engine\include\SceneTag.hpp" />
     <ClInclude Include="engine\include\Transform.hpp" />
+    <ClInclude Include="graphic\include\Camera.hpp" />
     <ClInclude Include="graphic\include\IndexBuffer.hpp" />
     <ClInclude Include="graphic\include\Mesh.hpp" />
     <ClInclude Include="graphic\include\Shader.hpp" />

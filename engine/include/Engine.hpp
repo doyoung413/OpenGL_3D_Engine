@@ -6,6 +6,7 @@ class ObjectManager;
 class RenderManager;
 class InputManager;
 class SceneManager;
+class CameraManager;
 class Engine
 {
 public:
@@ -17,6 +18,7 @@ public:
     void Init(int width_, int height_);
     void Run();
     void Shutdown();
+    void Quit() { isRunning = false; }
 
     static Engine& GetInstance();
     SDL_Window* GetSDLWindow() { return window; }
@@ -24,6 +26,7 @@ public:
     RenderManager* GetRenderManager() { return renderManager.get(); }
     InputManager* GetInputManager() { return inputManager.get(); }
     SceneManager* GetSceneManager() { return sceneManager.get(); }
+    CameraManager* GetCameraManager() { return cameraManager.get(); }
 
     int GetWindowWidth() const { return windowWidth; }
     int GetWindowHeight() const { return windowHeight; }
@@ -44,4 +47,5 @@ private:
     std::unique_ptr<RenderManager> renderManager;
     std::unique_ptr<InputManager> inputManager;
     std::unique_ptr<SceneManager> sceneManager;
+    std::unique_ptr<CameraManager> cameraManager;
 };

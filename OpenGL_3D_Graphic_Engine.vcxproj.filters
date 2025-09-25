@@ -81,6 +81,12 @@
     <ClCompile Include="engine\source\Engine.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
+    <ClCompile Include="graphic\source\Camera.cpp">
+      <Filter>Source Files\Graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\source\CameraManager.cpp">
+      <Filter>Source Files\Engine\Managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphic\include\IndexBuffer.hpp">
@@ -145,6 +151,12 @@
     </ClInclude>
     <ClInclude Include="engine\include\Engine.hpp">
       <Filter>Source Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="graphic\include\Camera.hpp">
+      <Filter>Source Files\Graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\CameraManager.hpp">
+      <Filter>Source Files\Engine\Managers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

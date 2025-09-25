@@ -2,6 +2,7 @@
 #include "Engine.hpp"
 #include "ObjectManager.hpp"
 #include "RenderManager.hpp"
+#include "CameraManager.hpp"
 #include "Scene.hpp"
 #include <iostream>
 
@@ -36,6 +37,11 @@ void SceneManager::ChangeScene(SceneTag tag)
     currentState = SceneState::CHANGE;
 }
 
+void SceneManager::ChangeState(SceneState state)
+{
+    currentState = state;
+}
+
 void SceneManager::Update(float dt)
 {
     switch (currentState)
@@ -46,21 +52,21 @@ void SceneManager::Update(float dt)
         else
         {
 
-            std::cout << "Engine Start." << std::endl;
+            std::cout << "Engine Start" << std::endl;
             currentState = SceneState::CHANGE;
         }
 
         break;
 
     case SceneState::LOAD:
-        std::cout << "Scene Loaded." << std::endl;
+        std::cout << "Scene Loaded" << std::endl;
         Engine::GetInstance().GetObjectManager()->DestroyAllObjects();
         Engine::GetInstance().GetRenderManager()->ResetAllResources();
         currentScene->Init();
         Engine::GetInstance().GetObjectManager()->ProcessQueues();
         Engine::GetInstance().GetRenderManager()->ProcessQueues();
         currentState = SceneState::UPDATE;
-        std::cout << "Scene Update." << std::endl;
+        std::cout << "Scene Update" << std::endl;
         break;
 
     case SceneState::UPDATE:
@@ -73,6 +79,8 @@ void SceneManager::Update(float dt)
             ObjectManager* objectManager = Engine::GetInstance().GetObjectManager();
             RenderManager* renderManager = Engine::GetInstance().GetRenderManager();
             currentScene->Update(dt);
+
+            Engine::GetInstance().GetCameraManager()->Update(dt);
 
             objectManager->Update(dt);
 
@@ -90,15 +98,21 @@ void SceneManager::Update(float dt)
         currentScene = sceneList[static_cast<int>(nextSceneTag)];
         nextSceneTag = SceneTag::NONE;
         currentState = SceneState::LOAD;
-        std::cout << "Scene Change." << std::endl;
+        std::cout << "Scene Change" << std::endl;
         break;
     case SceneState::UNLOAD:
+        std::cout << "Scene End" << std::endl;
         currentScene->End();
+
+        Engine::GetInstance().GetObjectManager()->DestroyAllObjects();
+        Engine::GetInstance().GetRenderManager()->ResetAllResources();
+        Engine::GetInstance().GetCameraManager()->ClearCameras();
         currentState = SceneState::SHUTDOWN;
         break;
 
     case SceneState::SHUTDOWN:
-        std::cout << "ShutDown." << std::endl;
+        Engine::GetInstance().Quit();
+        std::cout << "ShutDown" << std::endl;
         break;
     }
 }

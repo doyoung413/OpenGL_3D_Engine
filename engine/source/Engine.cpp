@@ -3,6 +3,7 @@
 #include "RenderManager.hpp"
 #include "InputManager.hpp"
 #include "SceneManager.hpp"
+#include "CameraManager.hpp"
 
 #include <glew.h>
 #include <iostream>
@@ -15,10 +16,11 @@ Engine& Engine::GetInstance()
 
 void Engine::Init(int width_, int height_)
 {
-    objectManager = std::unique_ptr<ObjectManager>(new ObjectManager());
-    renderManager = std::unique_ptr<RenderManager>(new RenderManager());
-    inputManager = std::unique_ptr<InputManager>(new InputManager());
-    sceneManager = std::unique_ptr<SceneManager>(new SceneManager());
+    objectManager = std::make_unique<ObjectManager>();
+    renderManager = std::make_unique<RenderManager>();
+    inputManager = std::make_unique<InputManager>();
+    sceneManager = std::make_unique<SceneManager>();
+    cameraManager = std::make_unique<CameraManager>();
 
     if (!SDL_Init(SDL_INIT_VIDEO)) 
     { 
@@ -94,13 +96,14 @@ void Engine::Run()
 
 void Engine::Shutdown()
 {
-    GetObjectManager()->DestroyAllObjects();
+    objectManager->DestroyAllObjects();
     renderManager->ResetAllResources();
+    cameraManager->ClearCameras();
 
     SDL_GL_DestroyContext(context);
     SDL_DestroyWindow(window);
     SDL_Quit();
-    std::cout << "Engine Shutdown." << std::endl;
+    std::cout << "Engine Shutdown" << std::endl;
 }
 
 void Engine::ToggleFullscreen()
@@ -122,8 +125,8 @@ void Engine::HandleWindowEvent(const SDL_WindowEvent& windowEvent)
     {
         windowWidth = windowEvent.data1;
         windowHeight = windowEvent.data2;
-        glViewport(0, 0, windowWidth, windowHeight);
-        std::cout << "Resized to " << windowWidth << "x" << windowHeight << std::endl;
+        std::cout << "[Window] Resized to " << windowWidth << "x" << windowHeight << std::endl;
+        break;
         break;
     }
 

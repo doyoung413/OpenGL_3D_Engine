@@ -13,4 +13,7 @@ public:
 private:
     void HandleInputTests();
     void HandleCameraInput(float dt);
+    void HandlePlayerControl(float dt);
+
+    Object* controlledPlayer = nullptr;
 };

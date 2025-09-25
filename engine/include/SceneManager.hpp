@@ -25,6 +25,7 @@ public:
 
     void AddScene(SceneTag tag, Scene* scene);
     void ChangeScene(SceneTag tag);
+    void ChangeState(SceneState state);
 
 private:
     // 씬 태그 순서대로 저장

@@ -2,8 +2,10 @@
 #include "Engine.hpp"
 #include "ObjectManager.hpp"
 #include "MeshRenderer.hpp"
+#include "SceneManager.hpp"
 #include "RenderManager.hpp"
 #include "InputManager.hpp"
+#include "CameraManager.hpp"
 
 void MeshesScene::Init()
 {
@@ -97,11 +99,18 @@ void MeshesScene::Init()
         renderer->SetTexture("container");
         object->transform.SetPosition(3.0f, -0.25f, 0.0f);
     });
+
+    CameraManager* cameraManager = Engine::GetInstance().GetCameraManager();
+
+    int mainCamIndex = cameraManager->CreateCamera();
+    cameraManager->SetMainCamera(mainCamIndex);
+    cameraManager->GetMainCamera()->SetCameraPosition({0.0f, 0.0f, -3.f});
 }
 
-void MeshesScene::Update(float /*dt*/)
+void MeshesScene::Update(float dt)
 {
     HandleInputTests();
+    HandleCameraInput(dt);
 }
 
 void MeshesScene::Restart()
@@ -156,9 +165,59 @@ void MeshesScene::HandleInputTests()
         }
     }
 
-    // F11 키를 눌러 전체화면 모드 토글
     if (input->IsKeyPressOnce(KEYBOARDKEYS::F11))
     {
         Engine::GetInstance().ToggleFullscreen();
+    }
+    if (input->IsKeyPressOnce(KEYBOARDKEYS::ESCAPE))
+    {
+        Engine::GetInstance().GetSceneManager()->ChangeState(SceneState::SHUTDOWN);
+    }
+}
+
+void MeshesScene::HandleCameraInput(float dt)
+{
+    Camera* mainCamera = Engine::GetInstance().GetCameraManager()->GetMainCamera();
+    if (!mainCamera)
+    {
+        return;
+    }
+
+    InputManager* input = Engine::GetInstance().GetInputManager();
+    const float cameraSpeed = 0.5f * dt;
+
+    if (input->IsKeyPressed(KEYBOARDKEYS::W)) 
+    {
+        mainCamera->MoveCameraPos(CameraMoveDir::FORWARD, cameraSpeed);
+    }
+    if (input->IsKeyPressed(KEYBOARDKEYS::S)) 
+    {
+        mainCamera->MoveCameraPos(CameraMoveDir::BACKWARD, cameraSpeed);
+    }
+    if (input->IsKeyPressed(KEYBOARDKEYS::A)) 
+    {
+        mainCamera->MoveCameraPos(CameraMoveDir::LEFT, cameraSpeed);
+    }
+    if (input->IsKeyPressed(KEYBOARDKEYS::D)) 
+    {
+        mainCamera->MoveCameraPos(CameraMoveDir::RIGHT, cameraSpeed);
+    }
+    if (input->IsKeyPressed(KEYBOARDKEYS::SPACE)) 
+    {
+        mainCamera->MoveCameraPos(CameraMoveDir::UP, cameraSpeed);
+    }
+    if (input->IsKeyPressed(KEYBOARDKEYS::LSHIFT)) 
+    {
+        mainCamera->MoveCameraPos(CameraMoveDir::DOWN, cameraSpeed);
+    }
+
+    // 상대 마우스 모드가 켜져있을 때만 시점 변경
+    if (input->GetRelativeMouseMode())
+    {
+        glm::vec2 mouseDelta = input->GetRelativeMouseMotion();
+        if (mouseDelta.x != 0.0f || mouseDelta.y != 0.0f)
+        {
+            mainCamera->UpdateCameraDirection(mouseDelta);
+        }
     }
 }
