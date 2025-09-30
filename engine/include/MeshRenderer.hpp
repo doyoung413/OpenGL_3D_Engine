@@ -6,6 +6,7 @@
 class Shader;
 class Texture;
 class Camera;
+class Model;
 
 enum class RenderMode { Fill, Wireframe };
 
@@ -32,13 +33,17 @@ public:
     void SetShader(const std::string& name);
     void SetTexture(const std::string& name);
 
+    // 모델 로딩 함수
+    void LoadModel(const std::string& path);
+
     void SetRenderMode(RenderMode mode) { renderMode = mode; }
 
     void SetColor(const glm::vec4& color_) { color = color_; }
     const glm::vec4& GetColor() const { return color; }
 
 private:
-    std::unique_ptr<Mesh> mesh;
+    std::shared_ptr<Model> model; // 모델 파일 로딩용
+    std::unique_ptr<Mesh> mesh;   // CreateCube 등 절차적 생성용
     std::shared_ptr<Shader> shader;
     std::shared_ptr<Texture> texture;
     RenderMode renderMode = RenderMode::Fill;

@@ -103,18 +103,19 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)libs\SDL3\include;$(SolutionDir)libs\GLEW\include;$(SolutionDir)libs\GLM;$(SolutionDir)libs\STBI;$(SolutionDir)graphic\include;$(SolutionDir)engine\include;$(SolutionDir)demo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libs\SDL3\include;$(SolutionDir)libs\GLEW\include;$(SolutionDir)libs\GLM;$(SolutionDir)libs\STBI;$(SolutionDir)libs\Assimp\include;$(SolutionDir)graphic\include;$(SolutionDir)engine\include;$(SolutionDir)demo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)libs\SDL3\lib\x64;$(SolutionDir)libs\GLEW\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)libs\SDL3\lib\x64;$(SolutionDir)libs\GLEW\lib\x64;$(SolutionDir)libs\Assimp\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL3.lib
-;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+;glew32.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>copy "$(ProjectDir)\libs\SDL3\lib\x64\SDL3.dll" "$(OutDir)" 
-copy "$(ProjectDir)\libs\GLEW\bin\Release\x64\glew32.dll" "$(OutDir)" </Command>
+copy "$(ProjectDir)\libs\GLEW\bin\Release\x64\glew32.dll" "$(OutDir)" 
+copy "$(ProjectDir)\libs\Assimp\bin\Debug\assimp-vc143-mtd.dll" "$(OutDir)" </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -126,18 +127,19 @@ copy "$(ProjectDir)\libs\GLEW\bin\Release\x64\glew32.dll" "$(OutDir)" </Command>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)libs\SDL3\include;$(SolutionDir)libs\GLEW\include;$(SolutionDir)libs\GLM;$(SolutionDir)libs\STBI;$(SolutionDir)graphic\include;$(SolutionDir)engine\include;$(SolutionDir)demo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libs\SDL3\include;$(SolutionDir)libs\GLEW\include;$(SolutionDir)libs\GLM;$(SolutionDir)libs\STBI;$(SolutionDir)libs\Assimp\include;$(SolutionDir)graphic\include;$(SolutionDir)engine\include;$(SolutionDir)demo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)libs\SDL3\lib\x64;$(SolutionDir)libs\GLEW\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)libs\SDL3\lib\x64;$(SolutionDir)libs\GLEW\lib\x64;$(SolutionDir)libs\Assimp\lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL3.lib
-;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+;glew32.lib;assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>copy "$(ProjectDir)\libs\SDL3\lib\x64\SDL3.dll" "$(OutDir)" 
-copy "$(ProjectDir)\libs\GLEW\bin\Release\x64\glew32.dll" "$(OutDir)" </Command>
+copy "$(ProjectDir)\libs\GLEW\bin\Release\x64\glew32.dll" "$(OutDir)" 
+copy "$(ProjectDir)\libs\Assimp\bin\Release\assimp-vc143-mt.dll" "$(OutDir)" </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -153,6 +155,7 @@ copy "$(ProjectDir)\libs\GLEW\bin\Release\x64\glew32.dll" "$(OutDir)" </Command>
     <ClCompile Include="graphic\source\Camera.cpp" />
     <ClCompile Include="graphic\source\IndexBuffer.cpp" />
     <ClCompile Include="graphic\source\Mesh.cpp" />
+    <ClCompile Include="graphic\source\Model.cpp" />
     <ClCompile Include="graphic\source\Shader.cpp" />
     <ClCompile Include="graphic\source\Texture.cpp" />
     <ClCompile Include="graphic\source\VertexArray.cpp" />
@@ -178,6 +181,7 @@ copy "$(ProjectDir)\libs\GLEW\bin\Release\x64\glew32.dll" "$(OutDir)" </Command>
     <ClInclude Include="graphic\include\Camera.hpp" />
     <ClInclude Include="graphic\include\IndexBuffer.hpp" />
     <ClInclude Include="graphic\include\Mesh.hpp" />
+    <ClInclude Include="graphic\include\Model.hpp" />
     <ClInclude Include="graphic\include\Shader.hpp" />
     <ClInclude Include="graphic\include\Texture.hpp" />
     <ClInclude Include="graphic\include\VertexArray.hpp" />

@@ -18,12 +18,13 @@ void Mesh::UploadToGPU()
     // VertexArray에 VertexBuffer와 그 데이터 레이아웃을 전달
     vertexArray->AddVertexBuffer(std::move(vb), {
         // layout 0: Position (vec3)
-        {.dimension = 3, .layoutLocation = 0, .offset = (GLintptr)offsetof(Vertex, position), .stride = sizeof(Vertex) },
-        // layout 1: Color (vec3)
-        {.dimension = 3, .layoutLocation = 1, .offset = (GLintptr)offsetof(Vertex, color), .stride = sizeof(Vertex) },
-        // layout 2: Texture Coordinate (vec2)
-        {.dimension = 2, .layoutLocation = 2, .offset = (GLintptr)offsetof(Vertex, texCoord), .stride = sizeof(Vertex) }
-        // -------------------
+    {.dimension = 3, .layoutLocation = 0, .offset = (GLintptr)offsetof(Vertex, position), .stride = sizeof(Vertex) },
+        // layout 1: normal (vec3)
+    {.dimension = 3, .layoutLocation = 1, .offset = (GLintptr)offsetof(Vertex, normal),   .stride = sizeof(Vertex) },
+        // layout 2: Color (vec3)
+    {.dimension = 3, .layoutLocation = 2, .offset = (GLintptr)offsetof(Vertex, color),    .stride = sizeof(Vertex) },
+        // layout 3: Texture Coordinate (vec2)
+    {.dimension = 2, .layoutLocation = 3, .offset = (GLintptr)offsetof(Vertex, texCoord), .stride = sizeof(Vertex) } 
         });
 
     // VertexArray에 IndexBuffer를 전달
@@ -36,10 +37,11 @@ void Mesh::CreatePlane()
     indices.clear();
 
     vertices = {
-        { {-0.5f, 0.0f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f} }, // 좌측 하단
-        { { 0.5f, 0.0f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f} }, // 우측 하단
-        { { 0.5f, 0.0f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f} }, // 우측 상단
-        { {-0.5f, 0.0f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f} }  // 좌측 상단
+        // 위치,                   법선(모두 위를 향함),   색상(흰색),         텍스처 좌표
+        { {-0.5f, 0.0f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f} },
+        { { 0.5f, 0.0f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f} },
+        { { 0.5f, 0.0f,  0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f} },
+        { {-0.5f, 0.0f,  0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f} }
     };
 
     indices = {
@@ -56,43 +58,46 @@ void Mesh::CreateCube()
     indices.clear();
 
     vertices = {
-        // 위치,                   색상(흰색),         텍스처 좌표
-        // 뒷면
-        { {-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f} },
-        { { 0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f} },
-        { { 0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f} },
-        { {-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f} },
-        // 앞면
-        { {-0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f} },
-        { { 0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f} },
-        { { 0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f} },
-        { {-0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f} },
-        // 왼쪽 면
-        { {-0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f} },
-        { {-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f} },
-        { {-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f} },
-        { {-0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f} },
-        // 오른쪽 면
-        { { 0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f} },
-        { { 0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f} },
-        { { 0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f} },
-        { { 0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f} },
-        // 아랫면
-        { {-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f} },
-        { { 0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f} },
-        { { 0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f} },
-        { {-0.5f, -0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f} },
-        // 윗면
-        { {-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f} },
-        { { 0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f} },
-        { { 0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f} },
-        { {-0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f} }
+        // 위치,                   법선,                 색상,             텍스처 좌표
+        // 뒷면 (-Z)
+        { {-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f} },
+        { { 0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f} },
+        { { 0.5f,  0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f} },
+        { {-0.5f,  0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f} },
+        // 앞면 (+Z)
+        { {-0.5f, -0.5f,  0.5f}, {0.0f, 0.0f, 1.0f},  {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f} },
+        { { 0.5f, -0.5f,  0.5f}, {0.0f, 0.0f, 1.0f},  {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f} },
+        { { 0.5f,  0.5f,  0.5f}, {0.0f, 0.0f, 1.0f},  {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f} },
+        { {-0.5f,  0.5f,  0.5f}, {0.0f, 0.0f, 1.0f},  {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f} },
+        // 왼쪽 면 (-X)
+        { {-0.5f,  0.5f,  0.5f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f} },
+        { {-0.5f,  0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f} },
+        { {-0.5f, -0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f} },
+        { {-0.5f, -0.5f,  0.5f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f} },
+        // 오른쪽 면 (+X)
+        { { 0.5f,  0.5f,  0.5f}, {1.0f, 0.0f, 0.0f},  {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f} },
+        { { 0.5f,  0.5f, -0.5f}, {1.0f, 0.0f, 0.0f},  {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f} },
+        { { 0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f},  {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f} },
+        { { 0.5f, -0.5f,  0.5f}, {1.0f, 0.0f, 0.0f},  {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f} },
+        // 아랫면 (-Y)
+        { {-0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f},{1.0f, 1.0f, 1.0f}, {0.0f, 1.0f} },
+        { { 0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f},{1.0f, 1.0f, 1.0f}, {1.0f, 1.0f} },
+        { { 0.5f, -0.5f,  0.5f}, {0.0f, -1.0f, 0.0f},{1.0f, 1.0f, 1.0f}, {1.0f, 0.0f} },
+        { {-0.5f, -0.5f,  0.5f}, {0.0f, -1.0f, 0.0f},{1.0f, 1.0f, 1.0f}, {0.0f, 0.0f} },
+        // 윗면 (+Y)
+        { {-0.5f,  0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f} },
+        { { 0.5f,  0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f} },
+        { { 0.5f,  0.5f,  0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f} },
+        { {-0.5f,  0.5f,  0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f} }
     };
 
     indices = {
-        0, 1, 2,   2, 3, 0,    4, 5, 6,   6, 7, 4,
-        8, 9, 10,  10, 11, 8,   12, 13, 14, 14, 15, 12,
-        16, 17, 18, 18, 19, 16, 20, 21, 22, 22, 23, 20
+        0, 1, 2,   2, 3, 0,
+        4, 5, 6,   6, 7, 4,
+        8, 9, 10,  10, 11, 8,
+        12, 13, 14, 14, 15, 12,
+        16, 17, 18, 18, 19, 16,
+        20, 21, 22, 22, 23, 20
     };
     primitivePattern = PrimitivePattern::Triangles;
 }
@@ -127,12 +132,16 @@ void Mesh::CreateSphere()
             // 정점 위치 계산
             x = xy * cosf(sectorAngle);
             z = xy * sinf(sectorAngle);
+            glm::vec3 pos = { x, y, z };
+
+            // 법선 벡터 (구의 중심이 원점이므로, 위치 벡터를 정규화하면 법선이 됨)
+            glm::vec3 nrm = glm::normalize(pos);
 
             // 텍스처 좌표 계산
             u = (float)j / sectorCount;
             v = (float)i / stackCount;
 
-            vertices.push_back({ {x, y, z}, {1.0f, 1.0f, 1.0f}, {u, v} });
+            vertices.push_back({ pos, nrm, {1.0f, 1.0f, 1.0f}, {u, v} });
         }
     }
 
@@ -174,15 +183,32 @@ void Mesh::CreateDiamond()
 
     float halfSize = size * 0.5f;
 
-    vertices = {
-        // 6개의 꼭짓점
-        { { 0.0f,  halfSize,  0.0f}, {1.0f, 1.0f, 1.0f}, {0.5f, 1.0f} }, // 0: Top
-        { { 0.0f, -halfSize,  0.0f}, {1.0f, 1.0f, 1.0f}, {0.5f, 0.0f} }, // 1: Bottom
-        { {-halfSize,  0.0f,  0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.5f} }, // 2: Left
-        { { halfSize,  0.0f,  0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.5f} }, // 3: Right
-        { { 0.0f,  0.0f,  halfSize}, {1.0f, 1.0f, 1.0f}, {0.5f, 0.5f} }, // 4: Front
-        { { 0.0f,  0.0f, -halfSize}, {1.0f, 1.0f, 1.0f}, {0.5f, 0.5f} }  // 5: Back
+    // 6개의 고유한 정점 위치 정의
+        glm::vec3 positions[] = {
+            { 0.0f,  halfSize,  0.0f}, // 0: Top
+            { 0.0f, -halfSize,  0.0f}, // 1: Bottom
+            {-halfSize,  0.0f,  0.0f}, // 2: Left
+            { halfSize,  0.0f,  0.0f}, // 3: Right
+            { 0.0f,  0.0f,  halfSize}, // 4: Front
+            { 0.0f,  0.0f, -halfSize}  // 5: Back
     };
+
+    // 텍스처 좌표
+    glm::vec2 texcoords[] = {
+        {0.5f, 1.0f}, {0.5f, 0.0f}, {0.0f, 0.5f},
+        {1.0f, 0.5f}, {0.5f, 0.5f}, {0.5f, 0.5f}
+    };
+
+    // 6개의 정점에 대한 Vertex 객체 생성
+    for (int i = 0; i < 6; ++i)
+    {
+        vertices.push_back({
+            positions[i],                           // 위치
+            glm::normalize(positions[i]),           // 법선 (위치 벡터 정규화)
+            {1.0f, 1.0f, 1.0f},                     // 색상
+            texcoords[i]                            // 텍스처 좌표
+            });
+    }
 
     indices = {
         // 위쪽 4개 삼각형
@@ -206,31 +232,34 @@ void Mesh::CreateCylinder()
     float halfHeight = height / 2.0f;
 
     // 위 
-    vertices.push_back({ {0.0f, halfHeight, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.5f, 0.5f} }); // Top center
+    glm::vec3 topNormal = { 0.0f, 1.0f, 0.0f };
+    vertices.push_back({ {0.0f, halfHeight, 0.0f}, topNormal, {1.0f, 1.0f, 1.0f}, {0.5f, 0.5f} }); // Top center
     for (int i = 0; i <= segments; i++) {
         float angle = 2.0f * static_cast<float>(M_PI) * i / segments;
         float x = radius * cos(angle);
         float z = radius * sin(angle);
-        vertices.push_back({ {x, halfHeight, z}, {1.0f, 1.0f, 1.0f}, {(x / radius + 1.0f) * 0.5f, (z / radius + 1.0f) * 0.5f} });
+        vertices.push_back({ {x, halfHeight, z}, topNormal, {1.0f, 1.0f, 1.0f}, {(x / radius + 1.0f) * 0.5f, (z / radius + 1.0f) * 0.5f} });
     }
     // 아래
-    vertices.push_back({ {0.0f, -halfHeight, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.5f, 0.5f} }); // Bottom center
-    int bottomCenterIndex = static_cast<unsigned int>(vertices.size()) - 1;
+    glm::vec3 bottomNormal = { 0.0f, -1.0f, 0.0f };
+    unsigned int bottomCenterIndex = vertices.size();
+    vertices.push_back({ {0.0f, -halfHeight, 0.0f}, bottomNormal, {1.0f, 1.0f, 1.0f}, {0.5f, 0.5f} });
     for (int i = 0; i <= segments; i++) {
         float angle = 2.0f * static_cast<float>(M_PI) * i / segments;
         float x = radius * cos(angle);
         float z = radius * sin(angle);
-        vertices.push_back({ {x, -halfHeight, z}, {1.0f, 1.0f, 1.0f}, {(x / radius + 1.0f) * 0.5f, (z / radius + 1.0f) * 0.5f} });
+        vertices.push_back({ {x, -halfHeight, z}, bottomNormal, {1.0f, 1.0f, 1.0f}, {(x / radius + 1.0f) * 0.5f, (z / radius + 1.0f) * 0.5f} });
     }
     // 옆면
-    int sideStartIndex = static_cast<unsigned int>(vertices.size());
+    unsigned int sideStartIndex = vertices.size();
     for (int i = 0; i <= segments; i++) {
         float angle = 2.0f * static_cast<float>(M_PI) * i / segments;
         float x = radius * cos(angle);
         float z = radius * sin(angle);
         float u = (float)i / segments;
-        vertices.push_back({ {x, halfHeight, z}, {1.0f, 1.0f, 1.0f}, {u, 1.0f} }); // Top vertex
-        vertices.push_back({ {x, -halfHeight, z}, {1.0f, 1.0f, 1.0f}, {u, 0.0f} }); // Bottom vertex
+        glm::vec3 sideNormal = glm::normalize(glm::vec3(x, 0.0f, z));
+        vertices.push_back({ {x, halfHeight, z}, sideNormal, {1.0f, 1.0f, 1.0f}, {u, 1.0f} }); // Top vertex
+        vertices.push_back({ {x, -halfHeight, z}, sideNormal, {1.0f, 1.0f, 1.0f}, {u, 0.0f} }); // Bottom vertex
     }
 
     // 위
@@ -270,30 +299,45 @@ void Mesh::CreateCapsule()
     vertices.clear();
     indices.clear();
 
-    float cylinderHeight = height - 2 * radius;
+    float cylinderHeight = height - 2.f * radius;
+    if (cylinderHeight < 0) cylinderHeight = 0;
     float halfCylinderHeight = cylinderHeight / 2.0f;
 
     // 위쪽 반구
     for (int i = 0; i <= rings / 2; i++) {
-        float phi = M_PI * static_cast<float>(i) / rings;
+        float phi = static_cast<float>(M_PI) * static_cast<float>(i) / rings;
         for (int j = 0; j <= segments; j++) {
-            float theta = 2.0f * M_PI * static_cast<float>(j) / segments;
-            float x = radius * sin(phi) * cos(theta);
-            float y = radius * cos(phi);
-            float z = radius * sin(phi) * sin(theta);
-            vertices.push_back({ {x, y + halfCylinderHeight, z}, {1.0f, 1.0f, 1.0f}, {(float)j / segments, 1.0f - (float)i / rings} });
+            float theta = 2.0f * static_cast<float>(M_PI) * static_cast<float>(j) / segments;
+            glm::vec3 spherePos = {
+                radius * sin(phi) * cos(theta),
+                radius * cos(phi),
+                radius * sin(phi) * sin(theta)
+            };
+            vertices.push_back({
+                {spherePos.x, spherePos.y + halfCylinderHeight, spherePos.z}, // 위치
+                glm::normalize(spherePos),                                    // 법선
+                {1.0f, 1.0f, 1.0f},                                           // 색상
+                {(float)j / segments, 1.0f - (float)i / rings}                // UV
+                });
         }
     }
 
     // 아래쪽 반구
     for (int i = rings / 2; i <= rings; i++) {
-        float phi = M_PI * static_cast<float>(i) / rings;
+        float phi = static_cast<float>(M_PI) * static_cast<float>(i) / rings;
         for (int j = 0; j <= segments; j++) {
-            float theta = 2.0f * M_PI * static_cast<float>(j) / segments;
-            float x = radius * sin(phi) * cos(theta);
-            float y = radius * cos(phi);
-            float z = radius * sin(phi) * sin(theta);
-            vertices.push_back({ {x, y - halfCylinderHeight, z}, {1.0f, 1.0f, 1.0f}, {(float)j / segments, 1.0f - (float)i / rings} });
+            float theta = 2.0f * static_cast<float>(M_PI) * static_cast<float>(j) / segments;
+            glm::vec3 spherePos = {
+                radius * sin(phi) * cos(theta),
+                radius * cos(phi),
+                radius * sin(phi) * sin(theta)
+            };
+            vertices.push_back({
+                {spherePos.x, spherePos.y - halfCylinderHeight, spherePos.z}, // 위치
+                glm::normalize(spherePos),                                    // 법선
+                {1.0f, 1.0f, 1.0f},                                           // 색상
+                {(float)j / segments, 1.0f - (float)i / rings}                // UV
+                });
         }
     }
 
@@ -313,14 +357,4 @@ void Mesh::CreateCapsule()
     }
 
     primitivePattern = PrimitivePattern::Triangles;
-}
-
-void Mesh::CreateFromData(const std::vector<Vertex>& vertices_, const std::vector<unsigned int>& indices_, PrimitivePattern pattern_)
-{
-    this->vertices.clear();
-    this->indices.clear();
-
-    this->vertices = vertices_;
-    this->indices = indices_;
-    this->primitivePattern = pattern_;
 }

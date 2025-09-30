@@ -14,6 +14,7 @@ void MeshesScene::Init()
     renderManager->LoadShader("basic", "asset/shaders/basic.vert", "asset/shaders/basic.frag");
     renderManager->LoadTexture("wall", "asset/wall.jpg");
     renderManager->LoadTexture("container", "asset/container.jpg");
+    renderManager->LoadTexture("backpack", "asset/models/backpack/diffuse.jpg");
 
     // 평면
     objectManager->AddObject<Object>();
@@ -70,13 +71,13 @@ void MeshesScene::Init()
 
     // CreateFromData 테스트용 피라미드 생성
     std::vector<Vertex> pyramidVertices = {
-        // 밑면
-        { {-0.5f, -0.5f, -0.5f}, {0.2f, 0.3f, 0.8f}, {0.0f, 0.0f} },
-        { { 0.5f, -0.5f, -0.5f}, {0.2f, 0.3f, 0.8f}, {1.0f, 0.0f} },
-        { { 0.5f, -0.5f,  0.5f}, {0.2f, 0.3f, 0.8f}, {1.0f, 1.0f} },
-        { {-0.5f, -0.5f,  0.5f}, {0.2f, 0.3f, 0.8f}, {0.0f, 1.0f} },
-        // 꼭대기
-        { { 0.0f,  0.5f,  0.0f}, {1.0f, 1.0f, 0.2f}, {0.5f, 0.5f} }
+        // 각 정점에 법선(normal) 데이터를 추가합니다.
+        // 위치,                     법선(계산된 값),         색상,                   텍스처 좌표
+        Vertex{ {-0.5f, -0.5f, -0.5f}, {-0.5f, -0.5f, -0.5f}, {0.2f, 0.3f, 0.8f}, {0.0f, 0.0f} }, // 0
+        Vertex{ { 0.5f, -0.5f, -0.5f}, { 0.5f, -0.5f, -0.5f}, {0.2f, 0.3f, 0.8f}, {1.0f, 0.0f} }, // 1
+        Vertex{ { 0.5f, -0.5f,  0.5f}, { 0.5f, -0.5f,  0.5f}, {0.2f, 0.3f, 0.8f}, {1.0f, 1.0f} }, // 2
+        Vertex{ {-0.5f, -0.5f,  0.5f}, {-0.5f, -0.5f,  0.5f}, {0.2f, 0.3f, 0.8f}, {0.0f, 1.0f} }, // 3
+        Vertex{ { 0.0f,  0.5f,  0.0f}, { 0.0f,  1.0f,  0.0f}, {1.0f, 1.0f, 0.2f}, {0.5f, 0.5f} }  // 4
     };
 
     std::vector<unsigned int> pyramidIndices = {
@@ -100,11 +101,23 @@ void MeshesScene::Init()
         object->transform.SetPosition(3.0f, -0.25f, 0.0f);
     });
 
-    CameraManager* cameraManager = Engine::GetInstance().GetCameraManager();
+    //모델 불러오기
+    objectManager->AddObject<Object>();
+    objectManager->QueueObjectFunction(objectManager->FindObject(6), [&](Object* object) {
+        object->SetName("Backpack");
+        auto renderer = object->AddComponent<MeshRenderer>();
+        renderer->LoadModel("asset/models/backpack/backpack.obj");
+        renderer->SetShader("basic");
+        renderer->SetTexture("backpack");
+        object->transform.SetPosition(0.0f, 1.2f, 0.0f);
+        object->transform.SetScale(0.3f, 0.3f, 0.3f);
+    });
 
-    int mainCamIndex = cameraManager->CreateCamera();
-    cameraManager->SetMainCamera(mainCamIndex);
-    cameraManager->GetMainCamera()->SetCameraPosition({0.0f, 0.0f, -3.f});
+    CameraManager* cameraManager = Engine::GetInstance().GetCameraManager();
+    int index = cameraManager->CreateCamera();
+    Camera* camera = cameraManager->GetCamera(index);
+    camera->SetCameraPosition(glm::vec3{ 0.f,0.f,-3.f });
+    cameraManager->SetMainCamera(index);
 }
 
 void MeshesScene::Update(float dt)

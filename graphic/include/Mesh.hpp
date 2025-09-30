@@ -17,6 +17,7 @@ enum class PrimitivePattern
 struct Vertex
 {
     glm::vec3 position;
+    glm::vec3 normal;
     glm::vec3 color;
     glm::vec2 texCoord;
 };
@@ -33,14 +34,12 @@ public:
     void CreateDiamond();
     void CreateCylinder();
     void CreateCapsule();
-    void CreateFromData(const std::vector<Vertex>& vertices_, const std::vector<unsigned int>& indices_, PrimitivePattern pattern_);
 
     void UploadToGPU();
 
-
     VertexArray* GetVertexArray() const { return vertexArray.get(); }
     PrimitivePattern GetPrimitivePattern() const { return primitivePattern; }
-
+    GLsizei GetIndicesCount() const { return static_cast<GLsizei>(indices.size()); }
 private:
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
