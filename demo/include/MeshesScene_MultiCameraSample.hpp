@@ -2,7 +2,7 @@
 #include "Scene.hpp"
 
 class Object;
-class MeshesScene : public Scene
+class MeshesScene_MultiCameraSample : public Scene
 {
 public:
     void Init() override;

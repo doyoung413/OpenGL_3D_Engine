@@ -1,4 +1,4 @@
-#include "MeshesScene.hpp"
+#include "MeshesScene_MultiCameraSample.hpp"
 #include "Engine.hpp"
 #include "ObjectManager.hpp"
 #include "MeshRenderer.hpp"
@@ -6,7 +6,7 @@
 #include "InputManager.hpp"
 #include "CameraManager.hpp"
 
-void MeshesScene::Init()
+void MeshesScene_MultiCameraSample::Init()
 {
     ObjectManager* objectManager = Engine::GetInstance().GetObjectManager();
     RenderManager* renderManager = Engine::GetInstance().GetRenderManager();
@@ -89,7 +89,7 @@ void MeshesScene::Init()
     };
 
     objectManager->AddObject<Object>();
-        // [&] -> [=] 또는 [변수, 변수1....] => 람다가 변수들의 복사본 가짐
+    // [&] -> [=] 또는 [변수, 변수1....] => 람다가 변수들의 복사본 가짐
     objectManager->QueueObjectFunction(objectManager->FindObject(5),
         [pyramidVertices, pyramidIndices](Object* object) {
         auto renderer = object->AddComponent<MeshRenderer>();
@@ -108,7 +108,7 @@ void MeshesScene::Init()
         renderer->SetShader("basic");
         renderer->SetColor({ 0.9f, 0.2f, 0.2f, 1.0f }); // 붉은색
         object->transform.SetPosition(0.0f, 0.0f, 2.f);
-        object->transform.SetScale(20.0f, 1.f, 0.5f);
+        object->transform.SetScale(1.0f, 1.f, 0.5f);
     });
 
     // 카메라맨 2
@@ -130,34 +130,34 @@ void MeshesScene::Init()
     int mainCamIndex = cameraManager->CreateCamera();
     cameraManager->SetMainCamera(mainCamIndex);
     Camera* cam1 = cameraManager->GetCamera(mainCamIndex);
-    cam1->SetViewport(0, 0, windowWidth / 2, windowHeight); // 화면 왼쪽 절반
+    cam1->SetRelativeViewport(0, 0, 0.5f, 1.f); // 화면 왼쪽 절반
     cam1->SetCameraPosition({ 0.0f, 0.0f, 2.f });
 
     // 두 번째 카메라 생성 및 설정
     int cam2Index = cameraManager->CreateCamera();
     Camera* cam2 = cameraManager->GetCamera(cam2Index);
-    cam2->SetViewport(windowWidth / 2, 0, windowWidth / 2, windowHeight); // 화면 오른쪽 절반
+    cam2->SetRelativeViewport(0.5f, 0, 0.5f, 1.f); // 화면 오른쪽 절반
     cam2->SetCameraPosition({ 0.0f, 0.0f, -2.f });
 }
 
-void MeshesScene::Update(float dt)
+void MeshesScene_MultiCameraSample::Update(float dt)
 {
     HandleInputTests();
     HandleCameraInput(dt);
     HandlePlayerControl(dt);
 }
 
-void MeshesScene::Restart()
+void MeshesScene_MultiCameraSample::Restart()
 {
 }
 
-void MeshesScene::End()
+void MeshesScene_MultiCameraSample::End()
 {
     Engine::GetInstance().GetObjectManager()->DestroyAllObjects();
     Engine::GetInstance().GetRenderManager()->ResetAllResources();
 }
 
-void MeshesScene::HandleInputTests()
+void MeshesScene_MultiCameraSample::HandleInputTests()
 
 {
     InputManager* input = Engine::GetInstance().GetInputManager();
@@ -214,7 +214,7 @@ void MeshesScene::HandleInputTests()
     }
 }
 
-void MeshesScene::HandleCameraInput(float dt)
+void MeshesScene_MultiCameraSample::HandleCameraInput(float dt)
 {
     //Camera* mainCamera = Engine::GetInstance().GetCameraManager()->GetMainCamera();
     //if (!mainCamera)
@@ -344,7 +344,7 @@ void MeshesScene::HandleCameraInput(float dt)
 }
 
 
-void MeshesScene::HandlePlayerControl(float /*dt*/)
+void MeshesScene_MultiCameraSample::HandlePlayerControl(float /*dt*/)
 {
     InputManager* input = Engine::GetInstance().GetInputManager();
     ObjectManager* objManager = Engine::GetInstance().GetObjectManager();
