@@ -47,6 +47,19 @@ public:
         return nullptr;
     }
 
+    template <typename T>
+    bool HasComponent()
+    {
+        for (const auto& component : components)
+        {
+            if (dynamic_cast<T*>(component.get()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
 public:
     Transform transform;
 

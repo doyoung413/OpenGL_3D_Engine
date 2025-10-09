@@ -1,11 +1,15 @@
 #include "MeshRenderer.hpp"
+
 #include "Model.hpp"
+#include "Light.hpp"
+
 #include "Engine.hpp"
 #include "Object.hpp"
 #include "RenderManager.hpp"
 #include "CameraManager.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
+
 #include <glew.h>
 #include <gtc/type_ptr.hpp>
 
@@ -23,19 +27,13 @@ void MeshRenderer::End()
    Engine::GetInstance().GetRenderManager()->Unregister(this);
 }
 
-void MeshRenderer::Render()
-{
-    Render(Engine::GetInstance().GetCameraManager()->GetMainCamera());
-}
-
-void MeshRenderer::Render(Camera* camera)
+void MeshRenderer::Render(Camera* camera, Light* light)
 {// 렌더링할 데이터(model 또는 mesh)와 셰이더, 카메라가 없으면 함수 종료
     if ((!model && !mesh) || !shader || !camera)
     {
         return;
     }
 
-    // --- 1. 공통 렌더링 상태 설정 ---
     if (renderMode == RenderMode::Wireframe)
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -61,6 +59,34 @@ void MeshRenderer::Render(Camera* camera)
     shader->SetUniformMat4f("projection", projectionMat);
     shader->SetUniformVec4("color", color);
 
+    // 조명 유니폼 설정 (이제 light 인자를 직접 사용)
+    if (light)
+    {
+        Object* lightObject = light->GetOwner();
+        bool isPoint = (light->GetType() == LightType::Point);
+
+        if (isPoint)
+        {
+            shader->SetUniformVec3("lightPos", lightObject->transform.GetPosition() + light->GetOffsetForPointL());
+        }
+        else
+        {
+            shader->SetUniformVec3("lightPos", light->GetDirection());
+        }
+        shader->SetUniform1i("isPointLight", isPoint);
+
+        shader->SetUniformVec3("lightColor", light->GetColor());
+        shader->SetUniformVec3("viewPos", camera->GetCameraPosition());
+        shader->SetUniform1f("ambientStrength", light->GetAmbientIntensity());
+        shader->SetUniform1f("diffuseStrength", light->GetDiffuseIntensity());
+        shader->SetUniform1f("specularStrength", light->GetSpecularIntensity());
+        shader->SetUniform1i("shininess", light->GetShininess());
+    }
+    else // 빛이 없으면 기본값으로 설정
+    {
+        shader->SetUniformVec3("lightPos", { 0,0,0 });
+        shader->SetUniformVec3("lightColor", { 0,0,0 }); 
+    }
 
     if (model) // 모델 데이터가 있다면
     {

@@ -9,6 +9,7 @@ public:
     void Update(float dt) override;
     void Restart() override;
     void End() override;
+    void RenderImGui() override;
 
 private:
     void HandleInputTests();

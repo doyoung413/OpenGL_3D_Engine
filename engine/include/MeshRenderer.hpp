@@ -7,6 +7,7 @@ class Shader;
 class Texture;
 class Camera;
 class Model;
+class Light;
 
 enum class RenderMode { Fill, Wireframe };
 
@@ -19,8 +20,7 @@ public:
     void Update(float dt) override;
     void End() override;
 
-    void Render();
-    void Render(Camera* camera);
+    void Render(Camera* camera, Light* light);
 
     void CreatePlane();
     void CreateCube();

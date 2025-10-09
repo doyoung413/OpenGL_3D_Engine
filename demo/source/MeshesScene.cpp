@@ -1,4 +1,5 @@
 #include "MeshesScene.hpp"
+
 #include "Engine.hpp"
 #include "ObjectManager.hpp"
 #include "MeshRenderer.hpp"
@@ -6,6 +7,8 @@
 #include "RenderManager.hpp"
 #include "InputManager.hpp"
 #include "CameraManager.hpp"
+#include "Light.hpp"
+
 
 void MeshesScene::Init()
 {
@@ -112,6 +115,70 @@ void MeshesScene::Init()
         object->transform.SetPosition(0.0f, 1.2f, 0.0f);
         object->transform.SetScale(0.3f, 0.3f, 0.3f);
     });
+
+    // 붉은색 조명
+    objectManager->AddObject<Object>();
+    objectManager->QueueObjectFunction(objectManager->FindObject(7), [&](Object* object) {
+        object->SetName("Red Light");
+        object->transform.SetPosition({ -2.0f, 1.0f, 2.0f });
+
+        auto lightComp = object->AddComponent<Light>();
+        lightComp->SetColor({ 1.0f, 0.0f, 0.0f });
+        lightComp->SetType(LightType::Point);
+
+        auto renderer = object->AddComponent<MeshRenderer>();
+        renderer->CreateSphere();
+        renderer->SetShader("basic");
+        renderer->SetColor({ 1.0f, 0.0f, 0.0f, 1.0f });
+        object->transform.SetScale(0.2f, 0.2f, 0.2f);
+    });
+
+    // 푸른색 조명
+    objectManager->AddObject<Object>();
+    objectManager->QueueObjectFunction(objectManager->FindObject(8), [&](Object* object) {
+        object->SetName("Blue Light");
+        object->transform.SetPosition({ 2.0f, 1.0f, 2.0f });
+
+        auto lightComp = object->AddComponent<Light>();
+        lightComp->SetColor({ 0.0f, 0.0f, 1.0f });
+        lightComp->SetType(LightType::Point);
+
+        auto renderer = object->AddComponent<MeshRenderer>();
+        renderer->CreateSphere();
+        renderer->SetShader("basic");
+        renderer->SetColor({ 0.0f, 0.0f, 1.0f, 1.0f });
+        object->transform.SetScale(0.2f, 0.2f, 0.2f);
+    });
+
+    // 초록색 조명
+    objectManager->AddObject<Object>();
+    objectManager->QueueObjectFunction(objectManager->FindObject(9), [&](Object* object) {
+        object->SetName("Green Light");
+        object->transform.SetPosition({ 0.0f, 1.0f, -2.0f });
+
+        auto lightComp = object->AddComponent<Light>();
+        lightComp->SetColor({ 0.0f, 1.0f, 0.0f });
+        //lightComp->SetOffsetForPointL({ 0.0f, 0.0f, 2.0f });
+        lightComp->SetType(LightType::Point);
+
+        auto renderer = object->AddComponent<MeshRenderer>();
+        renderer->CreateSphere();
+        renderer->SetShader("basic");
+        renderer->SetColor({ 0.0f, 1.0f, 0.0f, 1.0f });
+        object->transform.SetScale(0.2f, 0.2f, 0.2f);
+    });
+
+    // 직접 조명
+    //objectManager->AddObject<Object>();
+    //objectManager->QueueObjectFunction(objectManager->FindObject(9), [&](Object* object) {
+    //    object->SetName("Green Light");
+    //    object->transform.SetPosition({ 0.0f, 1.0f, -2.0f });
+
+    //    auto lightComp = object->AddComponent<Light>();
+    //    lightComp->SetColor({ 1.0f, 1.0f, 1.0f });
+    //    lightComp->SetType(LightType::Directional);
+    //    lightComp->SetDirection({ -0.2f, -1.0f, -0.3f });
+    //});
 
     CameraManager* cameraManager = Engine::GetInstance().GetCameraManager();
     int index = cameraManager->CreateCamera();
@@ -233,4 +300,9 @@ void MeshesScene::HandleCameraInput(float dt)
             mainCamera->UpdateCameraDirection(mouseDelta);
         }
     }
+}
+
+void MeshesScene::RenderImGui()
+{
+    Engine::GetInstance().GetObjectManager()->ObjectControllerForImgui();
 }

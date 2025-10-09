@@ -5,6 +5,10 @@
 #include "SceneManager.hpp"
 #include "CameraManager.hpp"
 
+#include "imgui.h"
+#include "imgui_impl_sdl3.h"
+#include "imgui_impl_opengl3.h"
+
 #include <glew.h>
 #include <iostream>
 
@@ -60,6 +64,23 @@ void Engine::Init(int width_, int height_)
     }
     glEnable(GL_DEPTH_TEST);
 
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+    ImFontConfig font_config;
+    font_config.SizePixels = 18.0f;
+    io.Fonts->AddFontDefault(&font_config);
+    ImGui::GetStyle().ScaleAllSizes(2.f); // UI 요소들의 크기도 함께 조절
+
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // 키보드 컨트롤 활성화
+
+    ImGui::StyleColorsDark(); // 기본 다크 테마 설정
+
+    // SDL3와 OpenGL3 백엔드 초기화
+    ImGui_ImplSDL3_InitForOpenGL(window, context);
+    ImGui_ImplOpenGL3_Init("#version 430"); // GLSL 버전 문자열
+
     std::cout << "Engine Initialized Successfully!" << std::endl;
     isRunning = true;
 }
@@ -71,6 +92,7 @@ void Engine::Run()
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
+            ImGui_ImplSDL3_ProcessEvent(&event);
             switch (event.type)
             {
             case SDL_EVENT_QUIT:
@@ -96,6 +118,10 @@ void Engine::Run()
 
 void Engine::Shutdown()
 {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
+    ImGui::DestroyContext();
+
     objectManager->DestroyAllObjects();
     renderManager->ResetAllResources();
     cameraManager->ClearCameras();

@@ -34,6 +34,9 @@
     <Filter Include="Source Files\Demo">
       <UniqueIdentifier>{300b7f23-24be-4f57-ba35-03685fcd75f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Engine\Imgui">
+      <UniqueIdentifier>{f15b819a-ef34-47a1-b24b-75e10fe3a9ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -86,6 +89,30 @@
     </ClCompile>
     <ClCompile Include="engine\source\CameraManager.cpp">
       <Filter>Source Files\Engine\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="graphic\source\Model.cpp">
+      <Filter>Source Files\Graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="graphic\source\Light.cpp">
+      <Filter>Source Files\Engine\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui\imgui_widgets.cpp">
+      <Filter>Source Files\Engine\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui\imgui.cpp">
+      <Filter>Source Files\Engine\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui\imgui_draw.cpp">
+      <Filter>Source Files\Engine\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui\imgui_tables.cpp">
+      <Filter>Source Files\Engine\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui\backends\imgui_impl_sdl3.cpp">
+      <Filter>Source Files\Engine\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui\backends\imgui_impl_opengl3.cpp">
+      <Filter>Source Files\Engine\Imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -157,6 +184,12 @@
     </ClInclude>
     <ClInclude Include="engine\include\CameraManager.hpp">
       <Filter>Source Files\Engine\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="graphic\include\Model.hpp">
+      <Filter>Source Files\Graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="graphic\include\Light.hpp">
+      <Filter>Source Files\Engine\Component</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

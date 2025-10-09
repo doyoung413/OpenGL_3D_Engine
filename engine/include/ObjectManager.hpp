@@ -55,6 +55,8 @@ public:
     void DestroyAllObjects();
     void ProcessQueues();
 
+    const std::vector<std::unique_ptr<Object>>& GetObjectList() const { return objects; }
+    void ObjectControllerForImgui();
 private:
     friend class Engine;
 
@@ -62,4 +64,6 @@ private:
     std::vector<std::unique_ptr<Object>> objects;
     std::vector<std::function<void()>> commandQueue;
     std::vector<Object*> removalQueue;
+
+    Object* selectedObject = nullptr;
 };

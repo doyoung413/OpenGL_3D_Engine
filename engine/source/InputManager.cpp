@@ -1,5 +1,8 @@
 #include "Engine.hpp" 
 #include "InputManager.hpp"
+
+#include "imgui.h"
+#include "imgui_impl_sdl3.h"
 #include <SDL3/SDL.h>
 
 void InputManager::Update()
@@ -15,6 +18,13 @@ void InputManager::Update()
 
 void InputManager::PollEvent(SDL_Event& event)
 {
+    ImGui_ImplSDL3_ProcessEvent(&event);
+    ImGuiIO& io = ImGui::GetIO();
+    if (io.WantCaptureMouse || io.WantCaptureKeyboard)
+    {
+        return;
+    }
+
     switch (event.type)
     {
     case SDL_EVENT_KEY_DOWN:

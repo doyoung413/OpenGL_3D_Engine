@@ -6,6 +6,10 @@
 #include "Scene.hpp"
 #include <iostream>
 
+#include "imgui.h"
+#include "imgui_impl_sdl3.h"
+#include "imgui_impl_opengl3.h"
+
 SceneManager::SceneManager() {}
 
 SceneManager::~SceneManager()
@@ -42,6 +46,21 @@ void SceneManager::ChangeState(SceneState state)
     currentState = state;
 }
 
+void SceneManager::ImGuiBeginFrame()
+{
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
+    ImGui::NewFrame();
+}
+
+// ImGui의 렌더링 데이터를 최종적으로 화면에 그리는 로직을 모아둡니다.
+void SceneManager::ImGuiEndFrame()
+{
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+
 void SceneManager::Update(float dt)
 {
     switch (currentState)
@@ -76,6 +95,8 @@ void SceneManager::Update(float dt)
         }
         else
         {
+            ImGuiBeginFrame();
+
             ObjectManager* objectManager = Engine::GetInstance().GetObjectManager();
             RenderManager* renderManager = Engine::GetInstance().GetRenderManager();
             currentScene->Update(dt);
@@ -86,6 +107,9 @@ void SceneManager::Update(float dt)
 
             renderManager->BeginFrame();
             renderManager->Render();
+
+            currentScene->RenderImGui();
+            ImGuiEndFrame();
             renderManager->EndFrame();
 
             objectManager->ProcessQueues();

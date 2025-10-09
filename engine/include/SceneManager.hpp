@@ -26,8 +26,11 @@ public:
     void AddScene(SceneTag tag, Scene* scene);
     void ChangeScene(SceneTag tag);
     void ChangeState(SceneState state);
+    Scene* GetCurrentScene() const { return currentScene; }
 
 private:
+    void ImGuiBeginFrame();
+    void ImGuiEndFrame();
     // 씬 태그 순서대로 저장
     std::vector<Scene*> sceneList;
 

@@ -103,7 +103,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)libs\SDL3\include;$(SolutionDir)libs\GLEW\include;$(SolutionDir)libs\GLM;$(SolutionDir)libs\STBI;$(SolutionDir)libs\Assimp\include;$(SolutionDir)graphic\include;$(SolutionDir)engine\include;$(SolutionDir)demo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libs\SDL3\include;$(SolutionDir)libs\GLEW\include;$(SolutionDir)libs\GLM;$(SolutionDir)libs\STBI;$(SolutionDir)libs\Assimp\include;$(SolutionDir)libs\imgui;$(SolutionDir)libs\imgui\backends;$(SolutionDir)graphic\include;$(SolutionDir)engine\include;$(SolutionDir)demo\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,7 +127,7 @@ copy "$(ProjectDir)\libs\Assimp\bin\Debug\assimp-vc143-mtd.dll" "$(OutDir)" </Co
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)libs\SDL3\include;$(SolutionDir)libs\GLEW\include;$(SolutionDir)libs\GLM;$(SolutionDir)libs\STBI;$(SolutionDir)libs\Assimp\include;$(SolutionDir)graphic\include;$(SolutionDir)engine\include;$(SolutionDir)demo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libs\SDL3\include;$(SolutionDir)libs\GLEW\include;$(SolutionDir)libs\GLM;$(SolutionDir)libs\STBI;$(SolutionDir)libs\Assimp\include;$(SolutionDir)libs\imgui;$(SolutionDir)libs\imgui\backends;$(SolutionDir)graphic\include;$(SolutionDir)engine\include;$(SolutionDir)demo\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -154,12 +154,19 @@ copy "$(ProjectDir)\libs\Assimp\bin\Release\assimp-vc143-mt.dll" "$(OutDir)" </C
     <ClCompile Include="engine\source\SceneManager.cpp" />
     <ClCompile Include="graphic\source\Camera.cpp" />
     <ClCompile Include="graphic\source\IndexBuffer.cpp" />
+    <ClCompile Include="graphic\source\Light.cpp" />
     <ClCompile Include="graphic\source\Mesh.cpp" />
     <ClCompile Include="graphic\source\Model.cpp" />
     <ClCompile Include="graphic\source\Shader.cpp" />
     <ClCompile Include="graphic\source\Texture.cpp" />
     <ClCompile Include="graphic\source\VertexArray.cpp" />
     <ClCompile Include="graphic\source\VertexBuffer.cpp" />
+    <ClCompile Include="libs\imgui\backends\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="libs\imgui\backends\imgui_impl_sdl3.cpp" />
+    <ClCompile Include="libs\imgui\imgui.cpp" />
+    <ClCompile Include="libs\imgui\imgui_draw.cpp" />
+    <ClCompile Include="libs\imgui\imgui_tables.cpp" />
+    <ClCompile Include="libs\imgui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -180,6 +187,7 @@ copy "$(ProjectDir)\libs\Assimp\bin\Release\assimp-vc143-mt.dll" "$(OutDir)" </C
     <ClInclude Include="engine\include\Transform.hpp" />
     <ClInclude Include="graphic\include\Camera.hpp" />
     <ClInclude Include="graphic\include\IndexBuffer.hpp" />
+    <ClInclude Include="graphic\include\Light.hpp" />
     <ClInclude Include="graphic\include\Mesh.hpp" />
     <ClInclude Include="graphic\include\Model.hpp" />
     <ClInclude Include="graphic\include\Shader.hpp" />

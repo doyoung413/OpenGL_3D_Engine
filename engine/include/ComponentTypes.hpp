@@ -4,6 +4,7 @@
 enum class ComponentTypes
 {
     MESHRENDERER,
+    LIGHT,
     INVALID 
 };
 

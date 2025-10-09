@@ -4,6 +4,7 @@
 #include "CameraManager.hpp"
 #include "Shader.hpp"  
 #include "Texture.hpp" 
+#include "Light.hpp" 
 #include <algorithm>
 
 void RenderManager::Register(MeshRenderer* renderer)
@@ -42,20 +43,56 @@ void RenderManager::Render()
 
         // OpenGL의 뷰포트를 설정
         glViewport(static_cast<int>(vp.x * static_cast<float>(windowWidth)), static_cast<int>(vp.y * static_cast<float>(windowHeight)),
-            static_cast<int>(vp.z * static_cast<float>(windowWidth)), static_cast<int>(vp.w * static_cast<float>(windowHeight)) );
+            static_cast<int>(vp.z * static_cast<float>(windowWidth)), static_cast<int>(vp.w * static_cast<float>(windowHeight)));
 
         // 깊이 버퍼를 초기화
         glClear(GL_DEPTH_BUFFER_BIT);
 
         // 모든 객체를 현재 카메라의 시점에서 렌더링
-        for (MeshRenderer* renderer : renderers)
+        if (lights.empty())
         {
-            renderer->Render(camera);
+            // 빛 없이 모든 객체를 그림
+            for (MeshRenderer* renderer : renderers)
+            {
+                renderer->Render(camera, nullptr);
+            }
         }
-    }
+        else
+        {
+            int i = 0;
+            for (Light* light : lights)
+            {
+                if (!light) continue;
 
-    // 렌더링이 끝난 후, 다음 프레임이나 UI 렌더링을 위해 뷰포트를 전체 화면으로 되돌림
-    glViewport(0, 0, windowWidth, windowHeight);
+                // 첫 번째 조명이 아닐 경우, 가산 블렌딩을 활성화
+                if (i > 0)
+                {
+                    glEnable(GL_BLEND);
+                    // 덧셈 방식으로 색상을 혼합 (기존 색상 + 새로 그릴 색상)
+                    glBlendFunc(GL_ONE, GL_ONE);
+                    // 깊이 값이 같아도 그리도록 설정 (하이라이트가 겹치도록)
+                    glDepthFunc(GL_LEQUAL);
+                }
+
+                // 현재 빛의 영향을 받아 모든 객체를 렌더링
+                for (MeshRenderer* renderer : renderers)
+                {
+                    renderer->Render(camera, light);
+                }
+
+                // 가산 블렌딩을 사용했다면, 다음 카메라 뷰를 위해 상태를 원상 복구
+                if (i > 0)
+                {
+                    glDisable(GL_BLEND);
+                    glDepthFunc(GL_LESS); // 기본 깊이 테스트 함수로 복구
+                }
+                i++;
+            }
+        }
+
+        // 렌더링이 끝난 후, 다음 프레임이나 UI 렌더링을 위해 뷰포트를 전체 화면으로 되돌림
+        glViewport(0, 0, windowWidth, windowHeight);
+    }
 }
 
 void RenderManager::EndFrame()
@@ -131,4 +168,18 @@ void RenderManager::ResetAllResources()
 {
     ResetShaders();
     ResetTextures();
+}
+
+void RenderManager::RegisterLight(Light* light)
+{
+    lights.push_back(light);
+}
+
+void RenderManager::UnregisterLight(Light* light)
+{
+    auto it = std::find(lights.begin(), lights.end(), light);
+    if (it != lights.end())
+    {
+        lights.erase(it);
+    }
 }

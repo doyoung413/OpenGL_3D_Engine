@@ -7,8 +7,9 @@
 
 class Engine;
 class Shader;  
-class Texture; 
+class Texture;
 class MeshRenderer;
+class Light;
 
 class RenderManager
 {
@@ -20,6 +21,9 @@ public:
 
     void Register(MeshRenderer* renderer);
     void Unregister(MeshRenderer* renderer);
+
+    void RegisterLight(Light* light);
+    void UnregisterLight(Light* light);
 
     void BeginFrame();
     void Render();
@@ -42,6 +46,7 @@ private:
     std::vector<MeshRenderer*> renderers;
     std::vector<MeshRenderer*> pendingAddition;
     std::vector<MeshRenderer*> pendingRemoval;
+    std::vector<Light*> lights;
     glm::vec4 backGroundColor = { 0.1f, 0.1f, 0.15f, 1.0f };
 
     std::unordered_map<std::string, std::shared_ptr<Shader>> shaders;
