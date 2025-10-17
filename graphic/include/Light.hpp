@@ -16,7 +16,7 @@ public:
     
     void Init() override;
     void End() override;
-    void Update(float dt) override {};
+    void Update(float /*dt*/) override {};
 
     void SetColor(const glm::vec3& color_) { color = color_; }
     const glm::vec3& GetColor() const { return color; }

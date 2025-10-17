@@ -8,8 +8,8 @@ Model::Model(const std::string& path)
 
 void Model::LoadModel(const std::string& path)
 {
-    Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+    //허상 포인터(Dangling Pointer) 문제 해결
+    scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
@@ -35,8 +35,10 @@ std::shared_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* /*scene*/)
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
 
+    // 위치, 법선, UV 등 기본 정점 데이터 추출
     for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
         Vertex vertex;
+        SetVertexBoneDataToDefault(vertex); // 뼈 데이터를 기본값으로 초기화
         vertex.position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
         if (mesh->HasNormals()) {
             vertex.normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
@@ -51,11 +53,70 @@ std::shared_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* /*scene*/)
         vertices.push_back(vertex);
     }
 
+    // 인덱스 데이터 추출
     for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
         aiFace face = mesh->mFaces[i];
         for (unsigned int j = 0; j < face.mNumIndices; j++)
             indices.push_back(face.mIndices[j]);
     }
 
-    return std::make_shared<Mesh>(vertices, indices, PrimitivePattern::Triangles);
+    // 뼈 가중치 데이터 추출 (핵심)
+    ExtractBoneWeightForVertices(vertices, mesh, nullptr);
+
+    auto newMesh = std::make_shared<Mesh>(vertices, indices, PrimitivePattern::Triangles);
+    return newMesh;
+}
+
+void Model::SetVertexBoneDataToDefault(Vertex & vertex)
+{
+    for (int i = 0; i < MAX_BONE_INFLUENCE; i++)
+    {
+        vertex.boneIDs[i] = -1;
+        vertex.weights[i] = 0.0f;
+    }
+}
+
+void Model::ExtractBoneWeightForVertices(std::vector<Vertex>&vertices, aiMesh * mesh, const aiScene * /*scene*/)
+{
+    for (unsigned int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
+    {
+        int boneID = -1;
+        std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
+
+        // 이 뼈가 처음 발견된 것이라면, map에 새로 등록
+        if (m_BoneInfoMap.find(boneName) == m_BoneInfoMap.end())
+        {
+            BoneInfo newBoneInfo;
+            newBoneInfo.id = m_BoneCounter;
+            // Assimp 행렬을 glm 행렬로 변환
+            m_BoneInfoMap[boneName] = newBoneInfo;
+            boneID = m_BoneCounter;
+            m_BoneCounter++;
+        }
+        else // 이미 등록된 뼈라면 ID를 가져옴
+        {
+            boneID = m_BoneInfoMap[boneName].id;
+        }
+
+        // 각 뼈가 어떤 정점(vertex)에 얼마나 영향을 주는지(weight) 정보를 순회
+        auto weights = mesh->mBones[boneIndex]->mWeights;
+        int numWeights = mesh->mBones[boneIndex]->mNumWeights;
+
+        for (int weightIndex = 0; weightIndex < numWeights; ++weightIndex)
+        {
+            int vertexId = weights[weightIndex].mVertexId;
+            float weight = weights[weightIndex].mWeight;
+
+            // 해당 정점의 비어있는 boneIDs/weights 배열 슬롯을 찾아 정보를 등록
+            for (int i = 0; i < MAX_BONE_INFLUENCE; ++i)
+            {
+                if (vertices[vertexId].boneIDs[i] < 0)
+                {
+                    vertices[vertexId].weights[i] = weight;
+                    vertices[vertexId].boneIDs[i] = boneID;
+                    break;
+                }
+            }
+        }
+    }
 }

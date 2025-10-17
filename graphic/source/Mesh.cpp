@@ -17,14 +17,18 @@ void Mesh::UploadToGPU()
 
     // VertexArray에 VertexBuffer와 그 데이터 레이아웃을 전달
     vertexArray->AddVertexBuffer(std::move(vb), {
-        // layout 0: Position (vec3)
-    {.dimension = 3, .layoutLocation = 0, .offset = (GLintptr)offsetof(Vertex, position), .stride = sizeof(Vertex) },
-        // layout 1: normal (vec3)
-    {.dimension = 3, .layoutLocation = 1, .offset = (GLintptr)offsetof(Vertex, normal),   .stride = sizeof(Vertex) },
-        // layout 2: Color (vec3)
-    {.dimension = 3, .layoutLocation = 2, .offset = (GLintptr)offsetof(Vertex, color),    .stride = sizeof(Vertex) },
-        // layout 3: Texture Coordinate (vec2)
-    {.dimension = 2, .layoutLocation = 3, .offset = (GLintptr)offsetof(Vertex, texCoord), .stride = sizeof(Vertex) } 
+            // layout 0: Position (vec3)
+        {.dimension = 3, .layoutLocation = 0, .offset = (GLintptr)offsetof(Vertex, position), .stride = sizeof(Vertex) },
+            // layout 1: normal (vec3)
+        {.dimension = 3, .layoutLocation = 1, .offset = (GLintptr)offsetof(Vertex, normal),   .stride = sizeof(Vertex) },
+            // layout 2: Color (vec3)
+        {.dimension = 3, .layoutLocation = 2, .offset = (GLintptr)offsetof(Vertex, color),    .stride = sizeof(Vertex) },
+            // layout 3: Texture Coordinate (vec2)
+        {.dimension = 2, .layoutLocation = 3, .offset = (GLintptr)offsetof(Vertex, texCoord), .stride = sizeof(Vertex) } ,
+            // layout 4 : Bone IDs
+        { .dimension = 4, .layoutLocation = 4, .type = GL_INT, .offset = (GLintptr)offsetof(Vertex, boneIDs), .stride = sizeof(Vertex) },
+            // layout 5 : Weights
+        {.dimension = 4, .layoutLocation = 5, .offset = (GLintptr)offsetof(Vertex, weights), .stride = sizeof(Vertex) }
         });
 
     // VertexArray에 IndexBuffer를 전달

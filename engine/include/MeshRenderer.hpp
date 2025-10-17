@@ -35,6 +35,7 @@ public:
 
     // 모델 로딩 함수
     void LoadModel(const std::string& path);
+    Model* GetModel() const { return model.get(); }
 
     void SetRenderMode(RenderMode mode) { renderMode = mode; }
 

@@ -2,6 +2,8 @@
 #include "Engine.hpp"  
 #include "MeshRenderer.hpp"
 #include "CameraManager.hpp"
+#include "SceneManager.hpp"
+#include "Scene.hpp" 
 #include "Shader.hpp"  
 #include "Texture.hpp" 
 #include "Light.hpp" 
@@ -28,6 +30,8 @@ void RenderManager::Render()
     int windowWidth = Engine::GetInstance().GetWindowWidth();
     int windowHeight = Engine::GetInstance().GetWindowHeight();
     CameraManager* cameraManager = Engine::GetInstance().GetCameraManager();
+    Scene* currentScene = Engine::GetInstance().GetSceneManager()->GetCurrentScene(); // 현재 씬을 가져옴
+
     if (!cameraManager) return;
 
     // CameraManager가 관리하는 모든 카메라 리스트를 가져옴
@@ -89,6 +93,7 @@ void RenderManager::Render()
                 i++;
             }
         }
+        currentScene->PostRender(camera);
 
         // 렌더링이 끝난 후, 다음 프레임이나 UI 렌더링을 위해 뷰포트를 전체 화면으로 되돌림
         glViewport(0, 0, windowWidth, windowHeight);

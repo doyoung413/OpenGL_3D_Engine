@@ -4,6 +4,8 @@
 #include <glm.hpp>
 #include "VertexArray.hpp"
 
+#define MAX_BONE_INFLUENCE 4 // 각 정점은 최대 4개의 뼈에 영향을 받을 수 있음
+
 enum class PrimitivePattern
 {
     Lines = 0x0001,       
@@ -20,6 +22,10 @@ struct Vertex
     glm::vec3 normal;
     glm::vec3 color;
     glm::vec2 texCoord;
+
+    // 애니메이션 데이터
+    int boneIDs[MAX_BONE_INFLUENCE];   // 영향을 주는 뼈의 ID
+    float weights[MAX_BONE_INFLUENCE]; // 각 뼈로부터 받는 영향(가중치)
 };
 
 class Mesh
