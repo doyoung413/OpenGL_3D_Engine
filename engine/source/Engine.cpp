@@ -32,6 +32,11 @@ void Engine::Init(int width_, int height_)
         return; 
     }
 
+    // 멀티샘플 버퍼를 사용하겠다고 설정 (값은 1)
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+    // 4x 안티에일리어싱을 위한 샘플 수를 4로 설정
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE); 
@@ -62,6 +67,11 @@ void Engine::Init(int width_, int height_)
         SDL_Quit();
         return;
     }
+
+    if (isMSAAEnabled)
+    {
+        glEnable(GL_MULTISAMPLE);
+    }
     glEnable(GL_DEPTH_TEST);
 
     IMGUI_CHECKVERSION();
@@ -83,6 +93,12 @@ void Engine::Init(int width_, int height_)
 
     std::cout << "Engine Initialized Successfully!" << std::endl;
     isRunning = true;
+
+
+    GLint bufs, samples;
+    glGetIntegerv(GL_SAMPLE_BUFFERS, &bufs);
+    glGetIntegerv(GL_SAMPLES, &samples);
+    std::cout << "[INFO] MSAA | Buffers: " << bufs << ", Samples: " << samples << std::endl;
 }
 
 void Engine::Run()
@@ -137,6 +153,21 @@ void Engine::ToggleFullscreen()
     isFullscreen = !isFullscreen;
     SDL_SetWindowFullscreen(window, isFullscreen);
     std::cout << "Fullscreen mode " << (isFullscreen ? "ON" : "OFF") << std::endl;
+}
+
+void Engine::ToggleMSAA()
+{
+    isMSAAEnabled = !isMSAAEnabled; // 상태 반전
+    if (isMSAAEnabled)
+    {
+        glEnable(GL_MULTISAMPLE);
+        std::cout << "[Graphics] MSAA Enabled" << std::endl;
+    }
+    else
+    {
+        glDisable(GL_MULTISAMPLE);
+        std::cout << "[Graphics] MSAA Disabled" << std::endl;
+    }
 }
 
 void Engine::HandleWindowEvent(const SDL_WindowEvent& windowEvent)

@@ -362,3 +362,50 @@ void Mesh::CreateCapsule()
 
     primitivePattern = PrimitivePattern::Triangles;
 }
+
+void Mesh::CreateCone()
+{
+    // ±âº» Å©±â ¼³Á¤
+    const float radius = 1.0f;
+    const float height = 1.0f;
+    const int segments = 18;
+
+    vertices.clear();
+    indices.clear();
+
+    // ¹Ø¸é Áß½ÉÁ¡
+    vertices.push_back({ {0.0f, 0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.5f, 0.5f} });
+    // ¹Ø¸é ¿øÁÖ
+    for (int i = 0; i <= segments; i++) {
+        float angle = 2.0f * static_cast<float>(M_PI) * i / segments;
+        float x = radius * cos(angle);
+        float z = radius * sin(angle);
+        vertices.push_back({ {x, 0.0f, z}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {(x / radius + 1.0f) * 0.5f, (z / radius + 1.0f) * 0.5f} });
+    }
+
+    // ¿·¸é
+    unsigned int coneTipIndex = vertices.size();
+    vertices.push_back({ {0.0f, height, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.5f, 0.5f} });
+    for (int i = 0; i <= segments; i++) {
+        float angle = 2.0f * static_cast<float>(M_PI) * i / segments;
+        float x = radius * cos(angle);
+        float z = radius * sin(angle);
+        glm::vec3 normal = glm::normalize(glm::vec3(x, radius / height, z));
+        vertices.push_back({ {x, 0.0f, z}, normal, {1.0f, 1.0f, 1.0f}, {(x / radius + 1.0f) * 0.5f, (z / radius + 1.0f) * 0.5f} });
+    }
+
+    // ÀÎµ¦½º »ý¼º
+    // ¹Ø¸é
+    for (unsigned int i = 1; i <= segments; i++) {
+        indices.push_back(0);
+        indices.push_back(i + 1);
+        indices.push_back(i);
+    }
+    // ¿·¸é
+    for (unsigned int i = 0; i < segments; i++) {
+        indices.push_back(coneTipIndex);
+        indices.push_back(coneTipIndex + i + 1);
+        indices.push_back(coneTipIndex + i + 2);
+    }
+    primitivePattern = PrimitivePattern::Triangles;
+}

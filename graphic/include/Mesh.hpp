@@ -32,6 +32,7 @@ class Mesh
 {
 public:
     Mesh() = default;
+    ~Mesh() = default;
     Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, PrimitivePattern pattern = PrimitivePattern::Triangles);
 
     void CreatePlane();
@@ -40,6 +41,7 @@ public:
     void CreateDiamond();
     void CreateCylinder();
     void CreateCapsule();
+    void CreateCone();
 
     void UploadToGPU();
 

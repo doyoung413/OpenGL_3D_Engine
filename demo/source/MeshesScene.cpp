@@ -8,10 +8,7 @@
 #include "InputManager.hpp"
 #include "CameraManager.hpp"
 #include "Light.hpp"
-#include "Model.hpp"
 #include "Shader.hpp"
-
-#include <assimp/scene.h> 
 
 MeshesScene::MeshesScene() = default;
 MeshesScene::~MeshesScene() = default;
@@ -20,6 +17,7 @@ void MeshesScene::Init()
 {
     ObjectManager* objectManager = Engine::GetInstance().GetObjectManager();
     RenderManager* renderManager = Engine::GetInstance().GetRenderManager();
+
     renderManager->LoadShader("basic", "asset/shaders/basic.vert", "asset/shaders/basic.frag");
     renderManager->LoadShader("weight_debug", "asset/shaders/weight_debug.vert", "asset/shaders/weight_debug.frag");
     renderManager->LoadTexture("wall", "asset/wall.jpg");
@@ -214,14 +212,7 @@ void MeshesScene::Init()
     camera->SetCameraPosition(glm::vec3{ 0.f,0.f,-3.f });
     cameraManager->SetMainCamera(index);
 
-
-    // 디버그용 셰이더 로드 (기존 basic 셰이더를 사용해도 무방)
-    debugShader = renderManager->GetShader("basic");
-
-    // 뼈 위치에 그려줄 작은 구 메쉬 생성 및 GPU 업로드
-    boneMesh = std::make_unique<Mesh>();
-    boneMesh->CreateDiamond();
-    boneMesh->UploadToGPU();
+    objectManager->Init();
 }
 
 void MeshesScene::Update(float dt)
@@ -290,30 +281,9 @@ void MeshesScene::HandleInputTests()
     {
         Engine::GetInstance().GetSceneManager()->ChangeState(SceneState::SHUTDOWN);
     }
-    if (input->IsKeyPressOnce(KEYBOARDKEYS::NUMBER_1))
+    if (input->IsKeyPressOnce(KEYBOARDKEYS::NUMBER_3))
     {
-        isWeightDebugMode = !isWeightDebugMode; // 모드 전환
-
-        Object* loadedModelObject = Engine::GetInstance().GetObjectManager()->FindObjectByName("AnimationTestObj");
-        if (loadedModelObject)
-        {
-            MeshRenderer* renderer = loadedModelObject->GetComponent<MeshRenderer>();
-            if (isWeightDebugMode)
-            {
-                renderer->SetShader("weight_debug");
-                std::cout << "[Debug] Weight Map View ON" << std::endl;
-            }
-            else
-            {
-                renderer->SetShader("basic");
-                std::cout << "[Debug] Weight Map View OFF" << std::endl;
-            }
-        }
-    }
-    if (input->IsKeyPressOnce(KEYBOARDKEYS::NUMBER_2))
-    {
-        bDrawSkeleton = !bDrawSkeleton;
-        std::cout << "[Debug] Skeleton View " << (bDrawSkeleton ? "ON" : "OFF") << std::endl;
+        Engine::GetInstance().ToggleMSAA();
     }
 }
 
@@ -364,69 +334,11 @@ void MeshesScene::HandleCameraInput(float dt)
     }
 }
 
-inline glm::mat4 ConvertMatrixToGLMFormat(const aiMatrix4x4& from)
-{
-    glm::mat4 to;
-    to[0][0] = from.a1; to[1][0] = from.a2; to[2][0] = from.a3; to[3][0] = from.a4;
-    to[0][1] = from.b1; to[1][1] = from.b2; to[2][1] = from.b3; to[3][1] = from.b4;
-    to[0][2] = from.c1; to[1][2] = from.c2; to[2][2] = from.c3; to[3][2] = from.c4;
-    to[0][3] = from.d1; to[1][3] = from.d2; to[2][3] = from.d3; to[3][3] = from.d4;
-    return to;
-}
-
 void MeshesScene::PostRender(Camera* camera)
 {
-    // 뼈 그리기가 비활성화 상태이거나, 유효한 카메라가 없으면 즉시 종료
-    if (!bDrawSkeleton || !camera) return;
+    Engine::GetInstance().GetObjectManager()->RenderGizmos(camera);
+    Engine::GetInstance().GetObjectManager()->RenderBoneHierarchy(camera);
 
-    Object* character = Engine::GetInstance().GetObjectManager()->FindObjectByName("AnimationTestObj");
-    Model* model = character ? character->GetComponent<MeshRenderer>()->GetModel() : nullptr;
-    const aiScene* scene = model ? model->GetAssimpScene() : nullptr;
-
-    if (character && model && scene)
-    {
-        glDisable(GL_DEPTH_TEST);
-        // 뼈 계층 구조의 시작점부터 그리기를 시작하며, 현재 카메라 정보를 전달
-        DrawBoneHierarchy(scene->mRootNode, character->transform.GetModelMatrix(), camera);
-        glEnable(GL_DEPTH_TEST);
-    }
-}
-
-void MeshesScene::DrawBoneHierarchy(const aiNode* node, const glm::mat4& parentTransform, Camera* camera)
-{
-    // 현재 뼈의 월드 변환 계산
-    glm::mat4 nodeTransform = ConvertMatrixToGLMFormat(node->mTransformation);
-    glm::mat4 globalTransform = parentTransform * nodeTransform;
-
-    // 현재 뼈의 위치 그리기
-    if (debugShader && boneMesh)
-    {
-        debugShader->Bind();
-
-        debugShader->SetUniformMat4f("view", camera->GetViewMatrix());
-        debugShader->SetUniformMat4f("projection", camera->GetProjectionMatrix());
-
-        debugShader->SetUniform1i("useTexture", 0);
-        debugShader->SetUniformVec4("color", { 0.0f, 1.0f, 0.0f, 1.0f });
-
-        // 뼈의 최종 월드 위치에 뼈 를 위치시키고 크기를 조절합니다.
-        glm::mat4 boneModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(globalTransform[3]));
-        boneModelMatrix = glm::scale(boneModelMatrix, glm::vec3(0.03f));
-        debugShader->SetUniformMat4f("model", boneModelMatrix);
-
-        VertexArray* va = boneMesh->GetVertexArray();
-        if (va)
-        {
-            va->Bind();
-            glDrawElements(static_cast<GLenum>(boneMesh->GetPrimitivePattern()), boneMesh->GetIndicesCount(), GL_UNSIGNED_INT, 0);
-            va->UnBind();
-        }
-    }
-
-    for (unsigned int i = 0; i < node->mNumChildren; i++)
-    {
-        DrawBoneHierarchy(node->mChildren[i], globalTransform, camera);
-    }
 }
 
 void MeshesScene::RenderImGui()

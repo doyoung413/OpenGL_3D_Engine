@@ -3,15 +3,22 @@
 #include <vector>
 #include <memory>
 #include <functional>
+#include "glm.hpp"
 
 class Engine;
+class Mesh;
+class Shader;
+class Camera;
+struct aiNode;
 class ObjectManager
 {
 public:
-    ObjectManager() = default;
-    ~ObjectManager() = default;
+    ObjectManager();
+    ~ObjectManager();
     ObjectManager(const ObjectManager&) = delete;
     ObjectManager& operator=(const ObjectManager&) = delete;
+
+    void Init();
 
     template <typename T, typename... Args>
     void AddObject(Args... args)
@@ -57,6 +64,11 @@ public:
 
     const std::vector<std::unique_ptr<Object>>& GetObjectList() const { return objects; }
     void ObjectControllerForImgui();
+    
+    // Gizmo
+    void RenderGizmos(Camera* camera);
+    void RenderBoneHierarchy(Camera* camera);
+
 private:
     friend class Engine;
 
@@ -66,4 +78,20 @@ private:
     std::vector<Object*> removalQueue;
 
     Object* selectedObject = nullptr;
+
+    // Gizmo
+    std::unique_ptr<Mesh> gizmoArrowCone;
+    std::unique_ptr<Mesh> gizmoArrowCylinder;
+    std::shared_ptr<Shader> gizmoShader;
+
+    //Born
+    std::unique_ptr<Mesh> boneMesh;
+    std::shared_ptr<Shader> debugShader;
+
+    // 나머지 멤버 변수들
+    bool bDrawSkeleton = false;
+    bool isWeightDebugMode = false;
+
+    // 뼈를 재귀적으로 그리는 헬퍼 함수
+    void DrawBoneHierarchy(const aiNode* node, const glm::mat4& parentTransform, Camera* camera);
 };

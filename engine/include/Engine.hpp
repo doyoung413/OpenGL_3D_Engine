@@ -32,11 +32,13 @@ public:
     int GetWindowHeight() const { return windowHeight; }
 
     void ToggleFullscreen();
+    void ToggleMSAA();
 private:
     bool isRunning = false;
     int windowWidth = 800;
     int windowHeight = 600;
     bool isFullscreen = false;
+    bool isMSAAEnabled = false;
 
     void HandleWindowEvent(const SDL_WindowEvent& windowEvent);
 
