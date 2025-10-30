@@ -144,6 +144,7 @@ copy "$(ProjectDir)\libs\Assimp\bin\Release\assimp-vc143-mt.dll" "$(OutDir)" </C
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="demo\source\MeshesScene.cpp" />
+    <ClCompile Include="engine\source\Animator.cpp" />
     <ClCompile Include="engine\source\CameraManager.cpp" />
     <ClCompile Include="engine\source\Engine.cpp" />
     <ClCompile Include="engine\source\InputManager.cpp" />
@@ -152,6 +153,8 @@ copy "$(ProjectDir)\libs\Assimp\bin\Release\assimp-vc143-mt.dll" "$(OutDir)" </C
     <ClCompile Include="engine\source\ObjectManager.cpp" />
     <ClCompile Include="engine\source\RenderManager.cpp" />
     <ClCompile Include="engine\source\SceneManager.cpp" />
+    <ClCompile Include="graphic\source\Animation.cpp" />
+    <ClCompile Include="graphic\source\Bone.cpp" />
     <ClCompile Include="graphic\source\Camera.cpp" />
     <ClCompile Include="graphic\source\IndexBuffer.cpp" />
     <ClCompile Include="graphic\source\Light.cpp" />
@@ -171,6 +174,7 @@ copy "$(ProjectDir)\libs\Assimp\bin\Release\assimp-vc143-mt.dll" "$(OutDir)" </C
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="demo\include\MeshesScene.hpp" />
+    <ClInclude Include="engine\include\Animator.hpp" />
     <ClInclude Include="engine\include\CameraManager.hpp" />
     <ClInclude Include="engine\include\Component.hpp" />
     <ClInclude Include="engine\include\ComponentTypes.hpp" />
@@ -185,6 +189,8 @@ copy "$(ProjectDir)\libs\Assimp\bin\Release\assimp-vc143-mt.dll" "$(OutDir)" </C
     <ClInclude Include="engine\include\SceneManager.hpp" />
     <ClInclude Include="engine\include\SceneTag.hpp" />
     <ClInclude Include="engine\include\Transform.hpp" />
+    <ClInclude Include="graphic\include\Animation.hpp" />
+    <ClInclude Include="graphic\include\Bone.hpp" />
     <ClInclude Include="graphic\include\Camera.hpp" />
     <ClInclude Include="graphic\include\IndexBuffer.hpp" />
     <ClInclude Include="graphic\include\Light.hpp" />

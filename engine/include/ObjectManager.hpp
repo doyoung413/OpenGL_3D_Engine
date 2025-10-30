@@ -2,6 +2,8 @@
 #include "Object.hpp"
 #include <vector>
 #include <memory>
+#include <map>
+#include <string>
 #include <functional>
 #include "glm.hpp"
 
@@ -10,6 +12,7 @@ class Mesh;
 class Shader;
 class Camera;
 struct aiNode;
+struct AssimpNodeData;
 class ObjectManager
 {
 public:
@@ -61,7 +64,8 @@ public:
     void Update(float dt);
     void DestroyAllObjects();
     void ProcessQueues();
-
+    
+    //void DrawBoneHierarchy(const AssimpNodeData* node, const std::map<std::string, glm::mat4>& animatedTransforms, Camera* camera);
     const std::vector<std::unique_ptr<Object>>& GetObjectList() const { return objects; }
     void ObjectControllerForImgui();
     
@@ -78,6 +82,7 @@ private:
     std::vector<Object*> removalQueue;
 
     Object* selectedObject = nullptr;
+    std::shared_ptr<Shader> prevShader = nullptr;
 
     // Gizmo
     std::unique_ptr<Mesh> gizmoArrowCone;
@@ -93,5 +98,5 @@ private:
     bool isWeightDebugMode = false;
 
     // »À¸¦ Àç±ÍÀûÀ¸·Î ±×¸®´Â ÇïÆÛ ÇÔ¼ö
-    void DrawBoneHierarchy(const aiNode* node, const glm::mat4& parentTransform, Camera* camera);
+    void DrawBoneHierarchy(const AssimpNodeData* node, const std::map<std::string, glm::mat4>& animatedTransforms, Camera* camera);
 };

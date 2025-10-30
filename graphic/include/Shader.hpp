@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <glm.hpp>
 
 class Shader
@@ -25,8 +26,10 @@ public:
     void SetUniformVec3(const std::string& name, const glm::vec3& vector);
     void SetUniformVec4(const std::string& name, const glm::vec4& vector);
     void SetUniformMat4f(const std::string& name, const glm::mat4& matrix);
+    void SetUniformMat4fv(const std::string& name, int count, const glm::mat4& matrix);
 
     int GetShaderID() { return rendererID; }
+    bool HasUniform(const std::string& name) const;
 private:
     std::string ReadFile(const std::string& filepath);
     unsigned int CompileShader(unsigned int type, const std::string& source);
@@ -35,4 +38,5 @@ private:
 
     unsigned int rendererID;
     std::unordered_map<std::string, int> uniformLocationCache;
+    std::unordered_set<std::string> activeUniforms;
 };

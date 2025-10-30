@@ -11,6 +11,20 @@ Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath)
     std::string vertexSource = ReadFile(vertexPath);
     std::string fragmentSource = ReadFile(fragmentPath);
     rendererID = CreateProgram(vertexSource, fragmentSource);
+
+    // 셰이더 리플렉션: 모든 활성 유니폼 변수의 목록을 가져와 저장
+    GLint numActiveUniforms = 0;
+    glGetProgramiv(rendererID, GL_ACTIVE_UNIFORMS, &numActiveUniforms);
+
+    GLchar uniformName[256];
+    for (GLint i = 0; i < numActiveUniforms; i++)
+    {
+        GLsizei length;
+        GLint size;
+        GLenum type;
+        glGetActiveUniform(rendererID, i, sizeof(uniformName), &length, &size, &type, uniformName);
+        activeUniforms.insert(uniformName);
+    }
 }
 
 Shader::~Shader()
@@ -34,6 +48,19 @@ Shader& Shader::operator=(Shader&& other) noexcept
         other.rendererID = 0;
     }
     return *this;
+}
+
+bool Shader::HasUniform(const std::string& name) const
+{
+    if (activeUniforms.count(name)) {
+        return true;
+    }
+
+    if (activeUniforms.count(name + "[0]")) {
+        return true;
+    }
+
+    return false;
 }
 
 std::string Shader::ReadFile(const std::string& filepath)
@@ -61,10 +88,13 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
     {
         int length;
         glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
-        char* message = (char*)alloca(length * sizeof(char));
-        glGetShaderInfoLog(id, length, &length, message);
-        std::cerr << (type == GL_VERTEX_SHADER ? "버텍스" : "프래그먼트") << " 셰이더 컴파일 실패!" << std::endl;
-        std::cerr << message << std::endl;
+        if (length > 0)
+        {
+            std::vector<char> message(length);
+            glGetShaderInfoLog(id, length, nullptr, &message[0]);
+            std::cerr << (type == GL_VERTEX_SHADER ? "버텍스" : "프래그먼트") << " 셰이더 컴파일 실패!" << std::endl;
+            std::cerr << message.data() << std::endl;
+        }
         glDeleteShader(id);
         return 0;
     }
@@ -144,4 +174,9 @@ void Shader::SetUniformVec4(const std::string& name, const glm::vec4& vector)
 void Shader::SetUniformMat4f(const std::string& name, const glm::mat4& matrix)
 {
     glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix));
+}
+
+void Shader::SetUniformMat4fv(const std::string& name, int count, const glm::mat4& matrix)
+{
+    glUniformMatrix4fv(GetUniformLocation(name), count, GL_FALSE, glm::value_ptr(matrix));
 }

@@ -9,6 +9,8 @@
 #include "MeshRenderer.hpp"
 #include "Light.hpp"
 #include "Model.hpp"
+#include "Animator.hpp"
+#include "Animation.hpp"
 
 #include <assimp/scene.h> 
 #include "imgui.h"
@@ -33,12 +35,10 @@ void ObjectManager::Init()
 	gizmoArrowCylinder = std::make_unique<Mesh>();
 	gizmoArrowCylinder->CreateCylinder();
 	gizmoArrowCylinder->UploadToGPU();
-
-	gizmoShader = Engine::GetInstance().GetRenderManager()->GetShader("basic");
-
-
-	// 디버그용 셰이더 로드 (기존 basic 셰이더를 사용해도 무방)
-	debugShader = Engine::GetInstance().GetRenderManager()->GetShader("basic");
+	
+	Engine::GetInstance().GetRenderManager()->LoadShader("unlit", "asset/shaders/unlit_debug.vert", "asset/shaders/unlit_debug.frag");
+	gizmoShader = Engine::GetInstance().GetRenderManager()->GetShader("unlit");
+	debugShader = Engine::GetInstance().GetRenderManager()->GetShader("unlit");
 
 	// 뼈 위치에 그려줄 작은 구 메쉬 생성 및 GPU 업로드
 	boneMesh = std::make_unique<Mesh>();
@@ -135,7 +135,23 @@ void ObjectManager::ObjectControllerForImgui()
 		std::string uniqueID = label + "##" + std::to_string(reinterpret_cast<uintptr_t>(currentObject));
 		if (ImGui::Selectable(uniqueID.c_str(), selectedObject == currentObject))
 		{
+			if(selectedObject != nullptr)
+			{
+				MeshRenderer* renderer = selectedObject->GetComponent<MeshRenderer>();
+				if (renderer)
+				{
+					if (prevShader != nullptr)
+					{
+						renderer->SetShader(prevShader);
+					}
+					else
+					{
+						renderer->SetShader("basic");
+					}
+				}
+			}
 			bDrawSkeleton = false;
+			prevShader = nullptr;
 			selectedObject = currentObject;
 		}
 	}
@@ -185,13 +201,26 @@ void ObjectManager::ObjectControllerForImgui()
 						isWeightDebugMode = !isWeightDebugMode; // 모드 전환
 
 						MeshRenderer* renderer = selectedObject->GetComponent<MeshRenderer>();
-						if (isWeightDebugMode)
+						if(renderer)
 						{
-							renderer->SetShader("weight_debug");
-						}
-						else
-						{
-							renderer->SetShader("basic");
+							if (isWeightDebugMode)
+							{
+								prevShader = renderer->GetShader();
+								renderer->SetShader("weight_debug");
+							}
+							else
+							{
+								if (prevShader != nullptr)
+								{
+									renderer->SetShader(prevShader);
+									prevShader = nullptr;
+								}
+								else
+								{
+									renderer->SetShader("basic");
+									prevShader = nullptr;
+								}
+							}
 						}
 					}
 					ImGui::SameLine();
@@ -355,55 +384,63 @@ inline glm::mat4 ConvertMatrixToGLMFormat(const aiMatrix4x4& from)
 
 void ObjectManager::RenderBoneHierarchy(Camera* camera)
 {
-	// 뼈 그리기가 비활성화 상태이거나, 유효한 카메라가 없으면 즉시 종료
-	if (!bDrawSkeleton || !camera) return;
+	if (!bDrawSkeleton || !camera || !selectedObject) return;
 
-	Model* model = selectedObject ? selectedObject->GetComponent<MeshRenderer>()->GetModel() : nullptr;
-	const aiScene* scene = model ? model->GetAssimpScene() : nullptr;
-
-	if (selectedObject && model && scene)
+	// 선택된 오브젝트에 Animator 컴포넌트가 있는지 확인
+	if (selectedObject->HasComponent<Animator>())
 	{
+		Animator* animator = selectedObject->GetComponent<Animator>();
+		Animation* animation = animator->GetCurrentAnimation();
+		if (!animation) return;
+
 		glDisable(GL_DEPTH_TEST);
-		// 뼈 계층 구조의 시작점부터 그리기를 시작하며, 현재 카메라 정보를 전달
-		DrawBoneHierarchy(scene->mRootNode, selectedObject->transform.GetModelMatrix(), camera);
+
+		// Animator로부터 애니메이션이 적용된 뼈 행렬 맵을 가져옴
+		const auto& animatedTransforms = animator->GetGlobalBoneTransforms();
+		// 애니메이션의 뼈대 계층 구조의 루트 노드를 가져옴
+		const AssimpNodeData* rootNode = &animation->GetRootNode();
+
+		// 새 데이터를 사용하여 뼈 그리기 시작
+		DrawBoneHierarchy(rootNode, animatedTransforms, camera);
+
 		glEnable(GL_DEPTH_TEST);
 	}
-
 }
 
-void ObjectManager::DrawBoneHierarchy(const aiNode* node, const glm::mat4& parentTransform, Camera* camera)
+void ObjectManager::DrawBoneHierarchy(const AssimpNodeData* node, const std::map<std::string, glm::mat4>& animatedTransforms, Camera* camera)
 {
-	// 현재 뼈의 월드 변환 계산
-	glm::mat4 nodeTransform = ConvertMatrixToGLMFormat(node->mTransformation);
-	glm::mat4 globalTransform = parentTransform * nodeTransform;
-
-	// 현재 뼈의 위치 그리기
-	if (debugShader && boneMesh)
+	// 현재 노드 이름이 Animator가 제공한 맵에 있는지 확인
+	if (animatedTransforms.count(node->name))
 	{
-		debugShader->Bind();
+		// T-포즈 행렬 대신, 애니메이션이 적용된 월드 변환 행렬을 가져옴
+		glm::mat4 globalTransform = animatedTransforms.at(node->name);
 
-		debugShader->SetUniformMat4f("view", camera->GetViewMatrix());
-		debugShader->SetUniformMat4f("projection", camera->GetProjectionMatrix());
-
-		debugShader->SetUniform1i("useTexture", 0);
-		debugShader->SetUniformVec4("color", { 0.0f, 1.0f, 0.0f, 1.0f });
-
-		// 뼈의 최종 월드 위치에 뼈 를 위치시키고 크기를 조절합니다.
-		glm::mat4 boneModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(globalTransform[3]));
-		boneModelMatrix = glm::scale(boneModelMatrix, glm::vec3(0.03f));
-		debugShader->SetUniformMat4f("model", boneModelMatrix);
-
-		VertexArray* va = boneMesh->GetVertexArray();
-		if (va)
+		// 기존 뼈 그리기 로직 (이제 애니메이션된 위치에 다이아몬드를 그림)
+		if (debugShader && boneMesh)
 		{
-			va->Bind();
-			glDrawElements(static_cast<GLenum>(boneMesh->GetPrimitivePattern()), boneMesh->GetIndicesCount(), GL_UNSIGNED_INT, 0);
-			va->UnBind();
+			debugShader->Bind();
+			debugShader->SetUniformMat4f("view", camera->GetViewMatrix());
+			debugShader->SetUniformMat4f("projection", camera->GetProjectionMatrix());
+			debugShader->SetUniform1i("useTexture", 0);
+			debugShader->SetUniformVec4("color", { 0.0f, 1.0f, 0.0f, 1.0f });
+
+			glm::mat4 boneModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(globalTransform[3]));
+			boneModelMatrix = glm::scale(boneModelMatrix, glm::vec3(0.03f));
+			debugShader->SetUniformMat4f("model", boneModelMatrix);
+
+			VertexArray* va = boneMesh->GetVertexArray();
+			if (va)
+			{
+				va->Bind();
+				glDrawElements(static_cast<GLenum>(boneMesh->GetPrimitivePattern()), boneMesh->GetIndicesCount(), GL_UNSIGNED_INT, 0);
+				va->UnBind();
+			}
 		}
 	}
 
-	for (unsigned int i = 0; i < node->mNumChildren; i++)
+	// 자식 노드들에 대해 재귀 호출 (aiNode의 mChildren 대신 AssimpNodeData의 children 사용)
+	for (const auto& child : node->children)
 	{
-		DrawBoneHierarchy(node->mChildren[i], globalTransform, camera);
+		DrawBoneHierarchy(&child, animatedTransforms, camera);
 	}
 }

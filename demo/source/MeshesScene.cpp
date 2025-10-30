@@ -10,6 +10,9 @@
 #include "Light.hpp"
 #include "Shader.hpp"
 
+#include "Animator.hpp"
+#include "Animation.hpp"
+
 MeshesScene::MeshesScene() = default;
 MeshesScene::~MeshesScene() = default;
 
@@ -127,61 +130,61 @@ void MeshesScene::Init()
         object->transform.SetScale(0.3f, 0.3f, 0.3f);
     });
 
-    //// 붉은색 조명
-    //objectManager->AddObject<Object>();
-    //objectManager->QueueObjectFunction(objectManager->FindObject(7), [&](Object* object) {
-    //    object->SetName("Red Light");
-    //    object->transform.SetPosition({ -2.0f, 1.0f, 2.0f });
+    // 붉은색 조명
+    objectManager->AddObject<Object>();
+    objectManager->QueueObjectFunction(objectManager->FindObject(7), [&](Object* object) {
+        object->SetName("Red Light");
+        object->transform.SetPosition({ -2.0f, 1.0f, 2.0f });
 
-    //    auto lightComp = object->AddComponent<Light>();
-    //    lightComp->SetColor({ 1.0f, 0.0f, 0.0f });
-    //    lightComp->SetType(LightType::Point);
+        auto lightComp = object->AddComponent<Light>();
+        lightComp->SetColor({ 1.0f, 0.0f, 0.0f });
+        lightComp->SetType(LightType::Point);
 
-    //    auto renderer = object->AddComponent<MeshRenderer>();
-    //    renderer->CreateSphere();
-    //    renderer->SetShader("basic");
-    //    renderer->SetColor({ 1.0f, 0.0f, 0.0f, 1.0f });
-    //    object->transform.SetScale(0.2f, 0.2f, 0.2f);
-    //});
+        auto renderer = object->AddComponent<MeshRenderer>();
+        renderer->CreateSphere();
+        renderer->SetShader("basic");
+        renderer->SetColor({ 1.0f, 0.0f, 0.0f, 1.0f });
+        object->transform.SetScale(0.2f, 0.2f, 0.2f);
+    });
 
-    //// 푸른색 조명
-    //objectManager->AddObject<Object>();
-    //objectManager->QueueObjectFunction(objectManager->FindObject(8), [&](Object* object) {
-    //    object->SetName("Blue Light");
-    //    object->transform.SetPosition({ 2.0f, 1.0f, 2.0f });
+    // 푸른색 조명
+    objectManager->AddObject<Object>();
+    objectManager->QueueObjectFunction(objectManager->FindObject(8), [&](Object* object) {
+        object->SetName("Blue Light");
+        object->transform.SetPosition({ 2.0f, 1.0f, 2.0f });
 
-    //    auto lightComp = object->AddComponent<Light>();
-    //    lightComp->SetColor({ 0.0f, 0.0f, 1.0f });
-    //    lightComp->SetType(LightType::Point);
+        auto lightComp = object->AddComponent<Light>();
+        lightComp->SetColor({ 0.0f, 0.0f, 1.0f });
+        lightComp->SetType(LightType::Point);
 
-    //    auto renderer = object->AddComponent<MeshRenderer>();
-    //    renderer->CreateSphere();
-    //    renderer->SetShader("basic");
-    //    renderer->SetColor({ 0.0f, 0.0f, 1.0f, 1.0f });
-    //    object->transform.SetScale(0.2f, 0.2f, 0.2f);
-    //});
+        auto renderer = object->AddComponent<MeshRenderer>();
+        renderer->CreateSphere();
+        renderer->SetShader("basic");
+        renderer->SetColor({ 0.0f, 0.0f, 1.0f, 1.0f });
+        object->transform.SetScale(0.2f, 0.2f, 0.2f);
+    });
 
-    //// 초록색 조명
-    //objectManager->AddObject<Object>();
-    //objectManager->QueueObjectFunction(objectManager->FindObject(9), [&](Object* object) {
-    //    object->SetName("Green Light");
-    //    object->transform.SetPosition({ 0.0f, 1.0f, -2.0f });
+    // 초록색 조명
+    objectManager->AddObject<Object>();
+    objectManager->QueueObjectFunction(objectManager->FindObject(9), [&](Object* object) {
+        object->SetName("Green Light");
+        object->transform.SetPosition({ 0.0f, 1.0f, -2.0f });
 
-    //    auto lightComp = object->AddComponent<Light>();
-    //    lightComp->SetColor({ 0.0f, 1.0f, 0.0f });
-    //    //lightComp->SetOffsetForPointL({ 0.0f, 0.0f, 2.0f });
-    //    lightComp->SetType(LightType::Point);
+        auto lightComp = object->AddComponent<Light>();
+        lightComp->SetColor({ 0.0f, 1.0f, 0.0f });
+        //lightComp->SetOffsetForPointL({ 0.0f, 0.0f, 2.0f });
+        lightComp->SetType(LightType::Point);
 
-    //    auto renderer = object->AddComponent<MeshRenderer>();
-    //    renderer->CreateSphere();
-    //    renderer->SetShader("basic");
-    //    renderer->SetColor({ 0.0f, 1.0f, 0.0f, 1.0f });
-    //    object->transform.SetScale(0.2f, 0.2f, 0.2f);
-    //});
+        auto renderer = object->AddComponent<MeshRenderer>();
+        renderer->CreateSphere();
+        renderer->SetShader("basic");
+        renderer->SetColor({ 0.0f, 1.0f, 0.0f, 1.0f });
+        object->transform.SetScale(0.2f, 0.2f, 0.2f);
+    });
 
     // 직접 조명
     objectManager->AddObject<Object>();
-    objectManager->QueueObjectFunction(objectManager->FindObject(7), [&](Object* object) {
+    objectManager->QueueObjectFunction(objectManager->FindObject(10), [&](Object* object) {
         object->SetName("Direction Light");
         object->transform.SetPosition({ 0.0f, 1.0f, -2.0f });
 
@@ -191,20 +194,63 @@ void MeshesScene::Init()
         lightComp->SetDirection({ -0.2f, -1.0f, -0.3f });
     });
 
-    // FBX 모델
+    // 펀치하는 애니메이션
     objectManager->AddObject<Object>();
-    objectManager->QueueObjectFunction(objectManager->FindObject(8), [&](Object* object) {
-        object->SetName("AnimationTestObj");
+    objectManager->QueueObjectFunction(objectManager->FindObject(11), [&](Object* object) {
+        object->SetName("PunchingAnimationObj");
         auto renderer = object->AddComponent<MeshRenderer>();
-        renderer->LoadModel("asset/models/Test.fbx");
+        renderer->LoadModel("asset/models/Quad Punch.fbx");
+
+        Model* model = renderer->GetModel();
+        if (model) {
+            auto animation = std::make_unique<Animation>("asset/models/Quad Punch.fbx", model);
+            object->AddComponent<Animator>(std::move(animation));
+        }
 
         renderer->SetShader("basic");
-        // renderer->SetTexture("character_texture");
         object->transform.SetPosition(0.0f, -0.5f, -1.25f);
         object->transform.SetRotationY(180.f);
         object->transform.SetScale(0.01f, 0.01f, 0.01f);
     });
 
+
+    // 걷는 애니메이션
+    objectManager->AddObject<Object>();
+    objectManager->QueueObjectFunction(objectManager->FindObject(12), [&](Object* object) {
+        object->SetName("WalkingAnimationObj");
+        auto renderer = object->AddComponent<MeshRenderer>();
+        renderer->LoadModel("asset/models/Walking.fbx");
+
+        Model* model = renderer->GetModel();
+        if (model) {
+            auto animation = std::make_unique<Animation>("asset/models/Walking.fbx", model);
+            object->AddComponent<Animator>(std::move(animation));
+        }
+
+        renderer->SetShader("basic");
+        object->transform.SetPosition(2.0f, -0.5f, -1.25f);
+        object->transform.SetRotationY(180.f);
+        object->transform.SetScale(0.01f, 0.01f, 0.01f);
+    });
+
+    // 춤추는 애니메이션
+    objectManager->AddObject<Object>();
+    objectManager->QueueObjectFunction(objectManager->FindObject(13), [&](Object* object) {
+        object->SetName("DancingAnimationObj");
+        auto renderer = object->AddComponent<MeshRenderer>();
+        renderer->LoadModel("asset/models/Swing Dancing.fbx");
+
+        Model* model = renderer->GetModel();
+        if (model) {
+            auto animation = std::make_unique<Animation>("asset/models/Swing Dancing.fbx", model);
+            object->AddComponent<Animator>(std::move(animation));
+        }
+
+        renderer->SetShader("basic");
+        object->transform.SetPosition(-2.0f, -0.5f, -1.25f);
+        object->transform.SetRotationY(180.f);
+        object->transform.SetScale(0.01f, 0.01f, 0.01f);
+    });
 
     CameraManager* cameraManager = Engine::GetInstance().GetCameraManager();
     int index = cameraManager->CreateCamera();
@@ -296,7 +342,7 @@ void MeshesScene::HandleCameraInput(float dt)
     }
 
     InputManager* input = Engine::GetInstance().GetInputManager();
-    const float cameraSpeed = 0.5f * dt;
+    const float cameraSpeed = 2.5f * dt;
 
     if (input->IsKeyPressed(KEYBOARDKEYS::W)) 
     {

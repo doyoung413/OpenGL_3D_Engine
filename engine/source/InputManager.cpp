@@ -20,7 +20,7 @@ void InputManager::PollEvent(SDL_Event& event)
 {
     ImGui_ImplSDL3_ProcessEvent(&event);
     ImGuiIO& io = ImGui::GetIO();
-    if (io.WantCaptureMouse || io.WantCaptureKeyboard)
+    if ((io.WantCaptureMouse || io.WantCaptureKeyboard) && !GetRelativeMouseMode())
     {
         return;
     }

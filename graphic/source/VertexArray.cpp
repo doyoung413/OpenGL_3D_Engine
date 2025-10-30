@@ -28,7 +28,18 @@ void VertexArray::AddVertexBuffer(VertexBuffer&& buffer, std::initializer_list<G
 	{
 		glEnableVertexArrayAttrib(arrayHandle, attribute.layoutLocation);
 		glVertexArrayVertexBuffer(arrayHandle, attribute.layoutLocation, vb_handle, attribute.offset, attribute.stride);
-		glVertexArrayAttribFormat(arrayHandle, attribute.layoutLocation, attribute.dimension, attribute.type, attribute.normalized, attribute.relativeOffset);
+
+		if (attribute.isIntegerType)
+		{
+			// 정수 타입 속성은 Attrib'I'Format 함수를 사용해야 함
+			glVertexArrayAttribIFormat(arrayHandle, attribute.layoutLocation, attribute.dimension, attribute.type, attribute.relativeOffset);
+		}
+		else
+		{
+			// 실수 타입 속성은 기존 함수를 사용
+			glVertexArrayAttribFormat(arrayHandle, attribute.layoutLocation, attribute.dimension, attribute.type, attribute.normalized, attribute.relativeOffset);
+		}
+
 		glVertexArrayAttribBinding(arrayHandle, attribute.layoutLocation, attribute.layoutLocation);
 	}
 	//VBO -> VAO

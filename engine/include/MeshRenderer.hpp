@@ -31,6 +31,8 @@ public:
     void CreateFromData(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, PrimitivePattern pattern);
 
     void SetShader(const std::string& name);
+    void SetShader(std::shared_ptr<Shader> shader_);
+    std::shared_ptr<Shader> GetShader() { return shader; }
     void SetTexture(const std::string& name);
 
     // 모델 로딩 함수

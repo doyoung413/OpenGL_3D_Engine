@@ -29,7 +29,6 @@ private:
     std::vector<std::shared_ptr<Mesh>> meshes;
     std::string directory;
 
-    struct BoneInfo { int id; glm::mat4 offsetMatrix; };
     std::map<std::string, BoneInfo> m_BoneInfoMap; 
     Assimp::Importer importer;
     const aiScene* scene;

@@ -114,6 +114,15 @@
     <ClCompile Include="libs\imgui\backends\imgui_impl_opengl3.cpp">
       <Filter>Source Files\Engine\Imgui</Filter>
     </ClCompile>
+    <ClCompile Include="graphic\source\Bone.cpp">
+      <Filter>Source Files\Graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="graphic\source\Animation.cpp">
+      <Filter>Source Files\Graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\source\Animator.cpp">
+      <Filter>Source Files\Engine\Component</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphic\include\IndexBuffer.hpp">
@@ -189,6 +198,15 @@
       <Filter>Source Files\Graphic</Filter>
     </ClInclude>
     <ClInclude Include="graphic\include\Light.hpp">
+      <Filter>Source Files\Engine\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="graphic\include\Bone.hpp">
+      <Filter>Source Files\Graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="graphic\include\Animation.hpp">
+      <Filter>Source Files\Graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\Animator.hpp">
       <Filter>Source Files\Engine\Component</Filter>
     </ClInclude>
   </ItemGroup>

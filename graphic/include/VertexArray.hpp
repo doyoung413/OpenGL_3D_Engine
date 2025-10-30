@@ -13,6 +13,7 @@ struct GLVertexArrayAttribFormat
 	GLenum type = GL_FLOAT;
 	GLintptr offset = 0;
 	GLsizei stride = 0;
+	bool isIntegerType = false;
 };
 
 class VertexArray

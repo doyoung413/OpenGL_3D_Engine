@@ -2,6 +2,7 @@
 
 #include "Model.hpp"
 #include "Light.hpp"
+#include "Animator.hpp" 
 
 #include "Engine.hpp"
 #include "Object.hpp"
@@ -12,6 +13,7 @@
 
 #include <glew.h>
 #include <gtc/type_ptr.hpp>
+#include <iostream>
 
 void MeshRenderer::Init()
 {
@@ -28,39 +30,61 @@ void MeshRenderer::End()
 }
 
 void MeshRenderer::Render(Camera* camera, Light* light)
-{// 렌더링할 데이터(model 또는 mesh)와 셰이더, 카메라가 없으면 함수 종료
+{
+    // 렌더링에 필요한 기본 요소가 없으면 함수 종료
     if ((!model && !mesh) || !shader || !camera)
     {
         return;
     }
 
+    // 와이어프레임 모드 설정
     if (renderMode == RenderMode::Wireframe)
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
-    shader->Bind();
-    if (texture)
-    {
-        shader->SetUniform1i("useTexture", 1);
-        texture->Bind(0);
-        shader->SetUniform1i("Texture", 0);
-    }
-    else
-    {
-        shader->SetUniform1i("useTexture", 0);
-    }
 
-    // 공통 유니폼(행렬, 틴트 색상 등) 설정
+    // 현재 셰이더 활성화
+    shader->Bind();
+
+    // 공통 유니폼 설정 (모든 셰이더에 필요)
     glm::mat4 modelMat = GetOwner()->transform.GetModelMatrix();
     glm::mat4 viewMat = camera->GetViewMatrix();
     glm::mat4 projectionMat = camera->GetProjectionMatrix();
     shader->SetUniformMat4f("model", modelMat);
     shader->SetUniformMat4f("view", viewMat);
     shader->SetUniformMat4f("projection", projectionMat);
-    shader->SetUniformVec4("color", color);
 
-    // 조명 유니폼 설정 (이제 light 인자를 직접 사용)
-    if (light)
+    // 애니메이션 유니폼 설정
+    // 셰이더가 finalBonesMatrices를 사용하고, 이 오브젝트에 Animator가 있을 때만 실행
+    if (shader->HasUniform("finalBonesMatrices") && GetOwner()->HasComponent<Animator>())
+    {
+        auto animator = GetOwner()->GetComponent<Animator>();
+        const auto& transforms = animator->GetFinalBoneMatrices();
+        shader->SetUniformMat4fv("finalBonesMatrices", static_cast<int>(transforms.size()), transforms[0]);
+    }
+
+    // 텍스처 및 색상 유니폼 설정
+    // 셰이더가 useTexture 유니폼을 사용할 때만 실행
+    if (shader->HasUniform("useTexture"))
+    {
+        if (texture) {
+            shader->SetUniform1i("useTexture", 1);
+            texture->Bind(0);
+            shader->SetUniform1i("Texture", 0);
+        }
+        else {
+            shader->SetUniform1i("useTexture", 0);
+        }
+    }
+
+    // 셰이더가 color 유니폼을 사용할 때만 실행
+    if (shader->HasUniform("color")) {
+        shader->SetUniformVec4("color", color);
+    }
+
+    // 조명 유니폼 설정
+    // 빛이 존재하고, 셰이더가 lightPos 유니폼을 사용할 때만 실행
+    if (light && shader->HasUniform("lightPos"))
     {
         Object* lightObject = light->GetOwner();
         bool isPoint = (light->GetType() == LightType::Point);
@@ -85,24 +109,22 @@ void MeshRenderer::Render(Camera* camera, Light* light)
     else // 빛이 없으면 기본값으로 설정
     {
         shader->SetUniformVec3("lightPos", { 0,0,0 });
-        shader->SetUniformVec3("lightColor", { 0,0,0 }); 
+        shader->SetUniformVec3("lightColor", { 0,0,0 });
     }
 
-    if (model) // 모델 데이터가 있다면
+    if (model)
     {
-        // 모델이 가진 모든 메쉬를 순회하며 렌더링
-        for (const auto& mesh_in_model : model->GetMeshes())
+        for (const auto& meshInModel : model->GetMeshes())
         {
-            VertexArray* va = mesh_in_model->GetVertexArray();
+            VertexArray* va = meshInModel->GetVertexArray();
             if (!va) continue;
             va->Bind();
-            glDrawElements(static_cast<GLenum>(mesh_in_model->GetPrimitivePattern()), mesh_in_model->GetIndicesCount(), GL_UNSIGNED_INT, 0);
+            glDrawElements(static_cast<GLenum>(meshInModel->GetPrimitivePattern()), meshInModel->GetIndicesCount(), GL_UNSIGNED_INT, 0);
             va->UnBind();
         }
     }
-    else if (mesh) // 단일 메쉬 데이터가 있다면
+    else if (mesh)
     {
-        // 단일 메쉬를 렌더링
         VertexArray* va = mesh->GetVertexArray();
         if (va)
         {
@@ -112,6 +134,7 @@ void MeshRenderer::Render(Camera* camera, Light* light)
         }
     }
 
+    // 상태 복구
     if (renderMode == RenderMode::Wireframe)
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -181,14 +204,19 @@ void MeshRenderer::LoadModel(const std::string& path)
 {
     mesh = nullptr;
     model = std::make_shared<Model>(path);
-    for (const auto& mesh_in_model : model->GetMeshes()) {
-        mesh_in_model->UploadToGPU();
+    for (const auto& meshInModel : model->GetMeshes()) {
+        meshInModel->UploadToGPU();
     }
 }
 
 void MeshRenderer::SetShader(const std::string& name)
 {
     shader = Engine::GetInstance().GetRenderManager()->GetShader(name);
+}
+
+void MeshRenderer::SetShader(std::shared_ptr<Shader> shader_)
+{
+    shader = shader_;
 }
 
 void MeshRenderer::SetTexture(const std::string& name)

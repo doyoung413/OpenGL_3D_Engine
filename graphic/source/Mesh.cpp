@@ -26,7 +26,7 @@ void Mesh::UploadToGPU()
             // layout 3: Texture Coordinate (vec2)
         {.dimension = 2, .layoutLocation = 3, .offset = (GLintptr)offsetof(Vertex, texCoord), .stride = sizeof(Vertex) } ,
             // layout 4 : Bone IDs
-        { .dimension = 4, .layoutLocation = 4, .type = GL_INT, .offset = (GLintptr)offsetof(Vertex, boneIDs), .stride = sizeof(Vertex) },
+        {.dimension = 4, .layoutLocation = 4, .type = GL_INT, .offset = (GLintptr)offsetof(Vertex, boneIDs), .stride = sizeof(Vertex), .isIntegerType = true },
             // layout 5 : Weights
         {.dimension = 4, .layoutLocation = 5, .offset = (GLintptr)offsetof(Vertex, weights), .stride = sizeof(Vertex) }
         });

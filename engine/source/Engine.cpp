@@ -103,9 +103,15 @@ void Engine::Init(int width_, int height_)
 
 void Engine::Run()
 {
+    // 1프레임당 소요되어야 하는 시간 (단위: 고정밀 카운터 틱)
+    const Uint64 TICKS_PER_FRAME = SDL_GetPerformanceFrequency() / 60;
+
     while (isRunning)
     {
+        // 프레임 시작 시간 기록
+        Uint64 startTicks = SDL_GetPerformanceCounter();
         SDL_Event event;
+
         while (SDL_PollEvent(&event))
         {
             ImGui_ImplSDL3_ProcessEvent(&event);
@@ -129,6 +135,18 @@ void Engine::Run()
         // 로직 업데이트 및 렌더링
         sceneManager->Update(1.f / 60.f);
         inputManager->Update();
+
+        // 프레임 종료 시간 기록 및 대기 
+        Uint64 endTicks = SDL_GetPerformanceCounter();
+        Uint64 elapsedTicks = endTicks - startTicks;
+
+        // 1프레임을 처리하는 데 걸린 시간이 목표 시간보다 짧다면
+        if (elapsedTicks < TICKS_PER_FRAME)
+        {
+            // 남은 시간만큼 프로그램을 잠시 멈춤 (CPU 자원 낭비 방지)
+            Uint32 delayMs = (Uint32)(((TICKS_PER_FRAME - elapsedTicks) * 1000) / SDL_GetPerformanceFrequency());
+            SDL_Delay(delayMs);
+        }
     }
 }
 
