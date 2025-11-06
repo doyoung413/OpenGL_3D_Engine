@@ -144,6 +144,7 @@ copy "$(ProjectDir)\libs\Assimp\bin\Release\assimp-vc143-mt.dll" "$(OutDir)" </C
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="demo\source\MeshesScene.cpp" />
+    <ClCompile Include="engine\source\AnimationStateMachine.cpp" />
     <ClCompile Include="engine\source\Animator.cpp" />
     <ClCompile Include="engine\source\CameraManager.cpp" />
     <ClCompile Include="engine\source\Engine.cpp" />
@@ -174,6 +175,7 @@ copy "$(ProjectDir)\libs\Assimp\bin\Release\assimp-vc143-mt.dll" "$(OutDir)" </C
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="demo\include\MeshesScene.hpp" />
+    <ClInclude Include="engine\include\AnimationStateMachine.hpp" />
     <ClInclude Include="engine\include\Animator.hpp" />
     <ClInclude Include="engine\include\CameraManager.hpp" />
     <ClInclude Include="engine\include\Component.hpp" />

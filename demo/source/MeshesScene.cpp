@@ -12,6 +12,8 @@
 
 #include "Animator.hpp"
 #include "Animation.hpp"
+#include "AnimationStateMachine.hpp"
+#include "imgui.h"
 
 MeshesScene::MeshesScene() = default;
 MeshesScene::~MeshesScene() = default;
@@ -194,62 +196,54 @@ void MeshesScene::Init()
         lightComp->SetDirection({ -0.2f, -1.0f, -0.3f });
     });
 
-    // 펀치하는 애니메이션
+    //애니메이션 오브젝트
     objectManager->AddObject<Object>();
-    objectManager->QueueObjectFunction(objectManager->FindObject(11), [&](Object* object) {
-        object->SetName("PunchingAnimationObj");
-        auto renderer = object->AddComponent<MeshRenderer>();
-        renderer->LoadModel("asset/models/Quad Punch.fbx");
-
-        Model* model = renderer->GetModel();
-        if (model) {
-            auto animation = std::make_unique<Animation>("asset/models/Quad Punch.fbx", model);
-            object->AddComponent<Animator>(std::move(animation));
-        }
-
-        renderer->SetShader("basic");
+    objectManager->QueueObjectFunction(objectManager->FindObject(11), [this](Object* object) {
+        object->SetName("AnimationObject");
         object->transform.SetPosition(0.0f, -0.5f, -1.25f);
         object->transform.SetRotationY(180.f);
         object->transform.SetScale(0.01f, 0.01f, 0.01f);
+
+        auto renderer = object->AddComponent<MeshRenderer>();
+        renderer->LoadModel("asset/models/Test.fbx", "mixamorig:Hips");
+        renderer->SetShader("basic");
+        object->AddComponent<Animator>();
+        Model* model = renderer->GetModel();
+        if (model)
+        {
+            auto fsm = object->AddComponent<AnimationStateMachine>();
+
+            fsm->AddState("Walk", "asset/models/Walking_1.fbx");
+            fsm->AddState("Punch", "asset/models/Quad Punch.fbx");
+            fsm->AddState("Dance", "asset/models/Swing Dancing.fbx");
+            fsm->ChangeState("Punch");
+        }
     });
 
-
-    // 걷는 애니메이션
+    //춤 애니메이션 오브젝트
     objectManager->AddObject<Object>();
-    objectManager->QueueObjectFunction(objectManager->FindObject(12), [&](Object* object) {
-        object->SetName("WalkingAnimationObj");
-        auto renderer = object->AddComponent<MeshRenderer>();
-        renderer->LoadModel("asset/models/Walking.fbx");
-
-        Model* model = renderer->GetModel();
-        if (model) {
-            auto animation = std::make_unique<Animation>("asset/models/Walking.fbx", model);
-            object->AddComponent<Animator>(std::move(animation));
-        }
-
-        renderer->SetShader("basic");
-        object->transform.SetPosition(2.0f, -0.5f, -1.25f);
+    objectManager->QueueObjectFunction(objectManager->FindObject(12), [this](Object* object) {
+        object->SetName("DancingObject");
+        object->transform.SetPosition(2.0f, 0.5f, -1.25f);
         object->transform.SetRotationY(180.f);
         object->transform.SetScale(0.01f, 0.01f, 0.01f);
-    });
 
-    // 춤추는 애니메이션
-    objectManager->AddObject<Object>();
-    objectManager->QueueObjectFunction(objectManager->FindObject(13), [&](Object* object) {
-        object->SetName("DancingAnimationObj");
         auto renderer = object->AddComponent<MeshRenderer>();
-        renderer->LoadModel("asset/models/Swing Dancing.fbx");
-
-        Model* model = renderer->GetModel();
-        if (model) {
-            auto animation = std::make_unique<Animation>("asset/models/Swing Dancing.fbx", model);
-            object->AddComponent<Animator>(std::move(animation));
-        }
-
+        renderer->LoadModel("asset/models/character.fbx", "mixamorig:Hips");
         renderer->SetShader("basic");
-        object->transform.SetPosition(-2.0f, -0.5f, -1.25f);
-        object->transform.SetRotationY(180.f);
-        object->transform.SetScale(0.01f, 0.01f, 0.01f);
+        auto animator = object->AddComponent<Animator>();
+        animator->SetEnableRootMotion(true);
+        Model* model = renderer->GetModel();
+        if (model)
+        {
+            auto fsm = object->AddComponent<AnimationStateMachine>();
+
+            fsm->AddState("Thriller_1", "asset/models/Thriller_1.fbx");
+            fsm->AddState("Thriller_2", "asset/models/Thriller_2.fbx");
+            fsm->AddState("Thriller_3", "asset/models/Thriller_3.fbx");
+            fsm->AddState("Thriller_4", "asset/models/Thriller_4.fbx");
+            fsm->ChangeState("Thriller_1", false);
+        }
     });
 
     CameraManager* cameraManager = Engine::GetInstance().GetCameraManager();
@@ -265,8 +259,32 @@ void MeshesScene::Update(float dt)
 {
     HandleInputTests();
     HandleCameraInput(dt);
-}
 
+    Object* character = Engine::GetInstance().GetObjectManager()->FindObjectByName("DancingObject");
+    if (character)
+    {
+        auto fsm = character->GetComponent<AnimationStateMachine>();
+        auto animator = character->GetComponent<Animator>();
+
+
+        if (fsm->GetCurrentStateName() == "Thriller_1" && animator->GetPlaybackState() == PlaybackState::Stopped)
+        {
+            fsm->ChangeState("Thriller_2", false, 1.0f, 0.25f);
+        }
+        else if (fsm->GetCurrentStateName() == "Thriller_2" && animator->GetPlaybackState() == PlaybackState::Stopped)
+        {
+            fsm->ChangeState("Thriller_3", false, 1.0f, 0.25f);
+        }
+        else if (fsm->GetCurrentStateName() == "Thriller_3" && animator->GetPlaybackState() == PlaybackState::Stopped)
+        {
+            fsm->ChangeState("Thriller_4", false, 1.0f, 0.25f);
+        }
+        else if (fsm->GetCurrentStateName() == "Thriller_4" && animator->GetPlaybackState() == PlaybackState::Stopped)
+        {
+            fsm->ChangeState("Thriller_1", false, 1.0f, 0.25f);
+        }
+    }
+}
 void MeshesScene::Restart()
 {
 }

@@ -200,12 +200,18 @@ void MeshRenderer::CreateFromData(const std::vector<Vertex>& vertices, const std
     mesh->UploadToGPU();
 }
 
-void MeshRenderer::LoadModel(const std::string& path)
+void MeshRenderer::LoadModel(const std::string& path, const std::string& customRootBoneName)
 {
     mesh = nullptr;
     model = std::make_shared<Model>(path);
     for (const auto& meshInModel : model->GetMeshes()) {
         meshInModel->UploadToGPU();
+    }
+
+    Animator* animator = GetOwner()->GetComponent<Animator>();
+    if (animator)
+    {
+        animator->SetRootBoneName(customRootBoneName);
     }
 }
 

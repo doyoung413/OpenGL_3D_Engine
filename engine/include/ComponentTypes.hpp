@@ -6,6 +6,7 @@ enum class ComponentTypes
     MESHRENDERER,
     LIGHT,
     ANIMATOR,
+    ANIMATION_STATE_MACHINE,
     INVALID 
 };
 

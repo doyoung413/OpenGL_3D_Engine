@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Object.hpp"
 #include <vector>
 #include <memory>
@@ -93,10 +93,11 @@ private:
     std::unique_ptr<Mesh> boneMesh;
     std::shared_ptr<Shader> debugShader;
 
-    // ³ª¸ÓÁö ¸â¹ö º¯¼öµé
+    // ë‚˜ë¨¸ì§€ ë©¤ë²„ ë³€ìˆ˜ë“¤
     bool bDrawSkeleton = false;
     bool isWeightDebugMode = false;
+    std::string selectedBoneName = "";
 
-    // »À¸¦ Àç±ÍÀûÀ¸·Î ±×¸®´Â ÇïÆÛ ÇÔ¼ö
+    // ë¼ˆë¥¼ ì¬ê·€ì ìœ¼ë¡œ ê·¸ë¦¬ëŠ” í—¬í¼ í•¨ìˆ˜
     void DrawBoneHierarchy(const AssimpNodeData* node, const std::map<std::string, glm::mat4>& animatedTransforms, Camera* camera);
 };

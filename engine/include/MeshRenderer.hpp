@@ -36,7 +36,7 @@ public:
     void SetTexture(const std::string& name);
 
     // 모델 로딩 함수
-    void LoadModel(const std::string& path);
+    void LoadModel(const std::string& path, const std::string& customRootBoneName = "");
     Model* GetModel() const { return model.get(); }
 
     void SetRenderMode(RenderMode mode) { renderMode = mode; }

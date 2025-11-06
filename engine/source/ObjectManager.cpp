@@ -1,4 +1,4 @@
-#include "ObjectManager.hpp"
+ï»¿#include "ObjectManager.hpp"
 
 #include "Mesh.hpp"   
 #include "Shader.hpp" 
@@ -11,6 +11,7 @@
 #include "Model.hpp"
 #include "Animator.hpp"
 #include "Animation.hpp"
+#include "AnimationStateMachine.hpp"
 
 #include <assimp/scene.h> 
 #include "imgui.h"
@@ -40,7 +41,7 @@ void ObjectManager::Init()
 	gizmoShader = Engine::GetInstance().GetRenderManager()->GetShader("unlit");
 	debugShader = Engine::GetInstance().GetRenderManager()->GetShader("unlit");
 
-	// »À À§Ä¡¿¡ ±×·ÁÁÙ ÀÛÀº ±¸ ¸Ş½¬ »ı¼º ¹× GPU ¾÷·Îµå
+	// ë¼ˆ ìœ„ì¹˜ì— ê·¸ë ¤ì¤„ ì‘ì€ êµ¬ ë©”ì‰¬ ìƒì„± ë° GPU ì—…ë¡œë“œ
 	boneMesh = std::make_unique<Mesh>();
 	boneMesh->CreateDiamond();
 	boneMesh->UploadToGPU();
@@ -150,6 +151,7 @@ void ObjectManager::ObjectControllerForImgui()
 					}
 				}
 			}
+			selectedBoneName = "";
 			bDrawSkeleton = false;
 			prevShader = nullptr;
 			selectedObject = currentObject;
@@ -198,7 +200,7 @@ void ObjectManager::ObjectControllerForImgui()
 				{
 					if (ImGui::Button("ShowWeight"))
 					{
-						isWeightDebugMode = !isWeightDebugMode; // ¸ğµå ÀüÈ¯
+						isWeightDebugMode = !isWeightDebugMode; // ëª¨ë“œ ì „í™˜
 
 						MeshRenderer* renderer = selectedObject->GetComponent<MeshRenderer>();
 						if(renderer)
@@ -239,7 +241,7 @@ void ObjectManager::ObjectControllerForImgui()
 			{
 				Light* light = selectedObject->GetComponent<Light>();
 
-				// °øÅë ¼Ó¼º
+				// ê³µí†µ ì†ì„±
 				glm::vec3 color = light->GetColor();
 				float colorArr[3] = { color.x, color.y, color.z };
 				if (ImGui::ColorEdit3("Color", colorArr))
@@ -259,7 +261,7 @@ void ObjectManager::ObjectControllerForImgui()
 					light->SetDiffuseIntensity(diffuse);
 				}
 
-				// ºû Å¸ÀÔ¿¡ µû¸¥ °³º° ¼Ó¼º
+				// ë¹› íƒ€ì…ì— ë”°ë¥¸ ê°œë³„ ì†ì„±
 				ImGui::Separator();
 				if (light->GetType() == LightType::Point)
 				{
@@ -288,6 +290,190 @@ void ObjectManager::ObjectControllerForImgui()
 				}
 			}
 		}
+
+		if (selectedObject->HasComponent<AnimationStateMachine>())
+		{
+			if (ImGui::CollapsingHeader("Animation State Machine", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				auto fsm = selectedObject->GetComponent<AnimationStateMachine>();
+				auto animator = selectedObject->GetComponent<Animator>();
+				bool enableRootMotion = animator->IsRootMotionEnabled();
+
+				// í˜„ì¬ ìƒíƒœ ì´ë¦„ í‘œì‹œ
+				std::string currentStateName = fsm->GetCurrentStateName();
+
+				// ë“œë¡­ë‹¤ìš´ ë©”ë‰´ë¡œ ìƒíƒœ ë³€ê²½ UI
+				bool isLooping = animator->IsLooping();
+				if (ImGui::BeginCombo("State", currentStateName.c_str()))
+				{
+					auto stateNames = fsm->GetStateNames();
+					for (const auto& name : stateNames)
+					{
+						const bool isSelected = (name == currentStateName);
+						if (ImGui::Selectable(name.c_str(), isSelected))
+						{
+							fsm->ChangeState(name, isLooping);
+						}
+
+						if (isSelected)
+						{
+							ImGui::SetItemDefaultFocus();
+						}
+					}
+					ImGui::EndCombo();
+				}
+			
+				ImGui::Separator();
+				// í˜„ì¬ ì• ë‹ˆë©”ì´ì…˜ ì¬ìƒ ì‹œê°„ í‘œì‹œ UI
+				if (animator)
+				{
+					float absoluteTime = animator->GetCurrentTime();
+					float duration = animator->GetDuration();
+					if (duration == 0.0f) { duration = 1.0f; }
+
+					// ìŠ¬ë¼ì´ë”ì˜ ìµœëŒ€ ë²”ìœ„ë¥¼ duration(ê²½ê³„ ê°’)ì´ ì•„ë‹Œ, ë¼ˆê°€ ê¼¬ì´ì§€ ì•ŠëŠ” 'ì•ˆì „í•œ ë§ˆì§€ë§‰ ê°’'ìœ¼ë¡œ ì„¤ì •í•©ë‹ˆë‹¤.
+					float safeDuration = duration - 0.01f;
+					if (safeDuration < 0.0f) safeDuration = 0.0f;
+
+					// ìŠ¬ë¼ì´ë”ê°€ í‘œì‹œí•˜ê³  ì œì–´í•  ì‹œê°„ì„ 0.0 ~ safeDuration ì‚¬ì´ë¡œ í•œì •
+					float sliderTime = fmod(absoluteTime, duration);
+
+					// ë§Œì•½ sliderTimeì´ safeDurationì„ ì´ˆê³¼í•˜ë©´(ê²½ê³„ ê°’ì— ë„ë‹¬í•˜ë©´), ìŠ¬ë¼ì´ë”ì˜ ì†ì¡ì´ê°€ ìµœëŒ€ì¹˜ì— ë¨¸ë¬´ë¥´ë„ë¡ ê°’ì„ ê³ ì •(Clamp)í•©ë‹ˆë‹¤.
+					if (sliderTime > safeDuration)
+					{
+						sliderTime = safeDuration;
+					}
+
+					// ImGui ìŠ¬ë¼ì´ë”ì˜ ìµœëŒ€ê°’ì„ 'duration'ì´ ì•„ë‹Œ 'safeDuration'ìœ¼ë¡œ ì„¤ì •
+					if (ImGui::SliderFloat("Timeline", &sliderTime, 0.0f, safeDuration))
+					{
+						// ìŠ¬ë¼ì´ë”ë¥¼ ì›€ì§ì´ë©´, ê·¸ ê°’ì„ Animatorì˜ í˜„ì¬ ì‹œê°„ìœ¼ë¡œ ì„¤ì •
+						animator->SetCurrentTime(sliderTime);
+
+						// ë£¨íŠ¸ ëª¨ì…˜ ìœ„ì¹˜ë¡œ ì¦‰ì‹œ ì´ë™
+						if (animator->IsRootMotionEnabled())
+						{
+							animator->UpdateRootMotionTransformToTime(sliderTime);
+						}
+					}
+
+					// ìŠ¬ë¼ì´ë”ë¥¼ ì¡ê³  ìˆëŠ”ì§€(ìŠ¤í¬ëŸ¬ë¹™ ì¤‘ì¸ì§€) Animatorì—ê²Œ ì•Œë¦¼
+					animator->SetIsScrubbing(ImGui::IsItemActive());
+				}
+				ImGui::Separator(); // êµ¬ë¶„ì„  ì¶”ê°€
+
+				// ì¬ìƒ ë²„íŠ¼
+				if (ImGui::Button("Play"))
+				{
+					animator->Play();
+				}
+				ImGui::SameLine(); // ë²„íŠ¼ë“¤ì„ ê°™ì€ ì¤„ì— ë°°ì¹˜
+
+				// ì¼ì‹œì •ì§€ ë²„íŠ¼
+				if (ImGui::Button("Pause"))
+				{
+					animator->Pause();
+				}
+				ImGui::SameLine();
+
+				// ì •ì§€ ë²„íŠ¼
+				if (ImGui::Button("Stop"))
+				{
+					animator->Stop();
+				}
+
+				if (ImGui::Checkbox("Loop Animation", &isLooping))
+				{
+					// ì‚¬ìš©ìê°€ ì²´í¬ë°•ìŠ¤ë¥¼ í´ë¦­í•˜ì—¬ isLooping ê°’ì´ ë³€ê²½ë˜ì—ˆë‹¤ë©´,
+					// ë³€ê²½ëœ ê°’ì„ Animatorì— ì¦‰ì‹œ ë‹¤ì‹œ ì ìš©
+					animator->SetLooping(isLooping);
+				}
+
+				// ë£¨íŠ¸ ëª¨ì…˜ ì œì–´ UI ì¶”ê°€
+				ImGui::Separator();
+				RootMotionBakeOptions tempOptions = animator->GetBakeOptions();
+
+				ImGui::Checkbox("Apply Root Motion", &enableRootMotion);
+				animator->SetEnableRootMotion(enableRootMotion);
+
+				// Apply Root Motionì´ ì¼œì ¸ ìˆì„ ë•Œë§Œ í™œì„±í™”
+				ImGui::BeginDisabled(!animator->IsRootMotionEnabled());
+				{
+					std::string currentRootBone = animator->GetRootBoneName();
+					if (currentRootBone.empty()) {
+						currentRootBone = "None (Click to Select)";
+					}
+
+					if (ImGui::BeginCombo("Root Bone", currentRootBone.c_str()))
+					{
+						Animation* animation = animator->GetCurrentAnimation();
+						if (animation)
+						{
+							std::function<void(const AssimpNodeData*)> generateBoneNodes;
+							generateBoneNodes =
+								[&](const AssimpNodeData* node)
+							{
+								// ê° ë¼ˆë¥¼ ì„ íƒ ê°€ëŠ¥í•œ í•­ëª©ìœ¼ë¡œ ìƒì„±
+								if (ImGui::Selectable(node->name.c_str(), selectedBoneName == node->name))
+								{
+									// ë¼ˆë¥¼ í´ë¦­í•˜ë©´ Animatorì˜ ë£¨íŠ¸ ë¼ˆ ì´ë¦„ì„ ë³€ê²½
+									animator->SetRootBoneName(node->name);
+								}
+
+								// ëª¨ë“  ìì‹ì— ëŒ€í•´ ì¬ê·€ í˜¸ì¶œ
+								for (const auto& child : node->children)
+								{
+									generateBoneNodes(&child);
+								}
+							};
+
+							// ë£¨íŠ¸ ë…¸ë“œë¶€í„° ì‹œì‘í•˜ì—¬ ì „ì²´ ë¼ˆ ëª©ë¡ì„ ë“œë¡­ë‹¤ìš´ ë¦¬ìŠ¤íŠ¸ì— ê·¸ë¦¼
+							generateBoneNodes(&animation->GetRootNode());
+						}
+
+						ImGui::EndCombo();
+					}
+
+					ImGui::Text("Bake Into Pose:");
+					ImGui::Checkbox("X", &tempOptions.bakePositionX); ImGui::SameLine();
+					ImGui::Checkbox("Y", &tempOptions.bakePositionY); ImGui::SameLine();
+					ImGui::Checkbox("Z", &tempOptions.bakePositionZ);
+					ImGui::Checkbox("Rotation", &tempOptions.bakeRotation);
+				}
+				animator->SetBakeOptions(tempOptions);
+				ImGui::EndDisabled();
+
+				ImGui::Separator();
+				float currentSpeed = animator->GetSpeed();
+				// DragFloat ìœ„ì ¯ì„ ìƒì„±í•˜ì—¬ ì†ë„ë¥¼ ì œì–´ (0.0 ~ 5.0 ë²”ìœ„, 0.05 ë‹¨ìœ„ë¡œ ì¡°ì ˆ)
+				if (ImGui::DragFloat("Playback Speed", &currentSpeed, 0.05f, 0.0f, 100.0f))
+				{
+					// ì‚¬ìš©ìê°€ ê°’ì„ ë³€ê²½í•˜ë©´, Animatorì— ì¦‰ì‹œ ìƒˆë¡œìš´ ì†ë„ë¥¼ ì„¤ì •
+					animator->SetSpeed(currentSpeed);
+				}
+
+				// ë¼ˆ ëª©ë¡ UI
+				ImGui::Separator(); // êµ¬ë¶„ì„  ì¶”ê°€
+				Animation* animation = animator->GetCurrentAnimation();
+
+				if (animation)
+				{
+					ImGui::Text("Bone Hierarchy");
+					ImGui::BeginChild("BoneList", ImVec2(0, 150), true);
+
+					const auto& bones = animation->GetBones();
+					for (const auto& bone : bones)
+					{
+						const std::string& boneName = bone.GetBoneName();
+						if (ImGui::Selectable(boneName.c_str(), selectedBoneName == boneName))
+						{
+							selectedBoneName = boneName;
+						}
+					}
+					ImGui::EndChild();
+				}
+			}
+		}
 	}
 	else
 	{
@@ -298,7 +484,7 @@ void ObjectManager::ObjectControllerForImgui()
 
 void ObjectManager::RenderGizmos(Camera* camera)
 {
-	// ¼±ÅÃµÈ °´Ã¼°¡ ¾ø°Å³ª, ±×¸®´Â µ¥ ÇÊ¿äÇÑ ¸Ş½¬/¼ÎÀÌ´õ°¡ ÁØºñµÇÁö ¾Ê¾Ò´Ù¸é ÇÔ¼ö¸¦ Á¾·á
+	// ì„ íƒëœ ê°ì²´ê°€ ì—†ê±°ë‚˜, ê·¸ë¦¬ëŠ” ë° í•„ìš”í•œ ë©”ì‰¬/ì…°ì´ë”ê°€ ì¤€ë¹„ë˜ì§€ ì•Šì•˜ë‹¤ë©´ í•¨ìˆ˜ë¥¼ ì¢…ë£Œ
 	if (!selectedObject || !gizmoShader || !gizmoArrowCone || !gizmoArrowCylinder)
 	{
 		return;
@@ -316,59 +502,59 @@ void ObjectManager::RenderGizmos(Camera* camera)
 
 	if (!coneVA || !cylinderVA) return;
 
-	// ¼±ÅÃµÈ °´Ã¼ÀÇ À§Ä¡¸¦ °¡Á®¿É´Ï´Ù. ÀÌ À§Ä¡°¡ ±âÁî¸ğÀÇ Áß½É
+	// ì„ íƒëœ ê°ì²´ì˜ ìœ„ì¹˜ë¥¼ ê°€ì ¸ì˜µë‹ˆë‹¤. ì´ ìœ„ì¹˜ê°€ ê¸°ì¦ˆëª¨ì˜ ì¤‘ì‹¬
 	glm::vec3 objectPosition = selectedObject->transform.GetPosition();
 	glm::quat objectRotationQuat = glm::quat(glm::radians(selectedObject->transform.GetRotation()));
 	glm::mat4 objectRotationMatrix = glm::mat4_cast(objectRotationQuat);
 
-	const float gizmoLineLength = 1.0f; // ÃàÀÇ ±æÀÌ
-	const float gizmoLineRadius = 0.02f; // ÃàÀÇ µÎ²²
-	const float gizmoArrowHeadRadius = 0.05f; // È­»ìÃËÀÇ ¹İÁö¸§
-	const float gizmoArrowHeadLength = 0.2f; // È­»ìÃËÀÇ ±æÀÌ
+	const float gizmoLineLength = 1.0f; // ì¶•ì˜ ê¸¸ì´
+	const float gizmoLineRadius = 0.02f; // ì¶•ì˜ ë‘ê»˜
+	const float gizmoArrowHeadRadius = 0.05f; // í™”ì‚´ì´‰ì˜ ë°˜ì§€ë¦„
+	const float gizmoArrowHeadLength = 0.2f; // í™”ì‚´ì´‰ì˜ ê¸¸ì´
 
-	// XÃà
+	// Xì¶•
 	gizmoShader->SetUniformVec4("color", { 1.0f, 0.0f, 0.0f, 1.0f });
-	// ¿ø±âµÕ (¸öÅë)
+	// ì›ê¸°ë‘¥ (ëª¸í†µ)
 	glm::mat4 modelMatrix_X_Cyl = glm::translate(glm::mat4(1.0f), objectPosition) * objectRotationMatrix * glm::translate(glm::mat4(1.0f), { gizmoLineLength / 2.0f, 0.0f, 0.0f }) * glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), { 0.0f, 1.0f, 0.0f }) * glm::scale(glm::mat4(1.0f), { gizmoLineRadius, gizmoLineRadius, gizmoLineLength });
 	gizmoShader->SetUniformMat4f("model", modelMatrix_X_Cyl);
 	cylinderVA->Bind();
 	glDrawElements(GL_TRIANGLES, cylinderVA->GetIndicesCount(), GL_UNSIGNED_INT, 0);
-	// ¿ø»Ô (È­»ìÃË)
+	// ì›ë¿” (í™”ì‚´ì´‰)
 	glm::mat4 modelMatrix_X_Cone = glm::translate(glm::mat4(1.0f), objectPosition) * objectRotationMatrix * glm::translate(glm::mat4(1.0f), { gizmoLineLength, 0.0f, 0.0f }) * glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), { 0.0f, 0.0f, 1.0f }) * glm::scale(glm::mat4(1.0f), { gizmoArrowHeadRadius, gizmoArrowHeadLength, gizmoArrowHeadRadius });
 	gizmoShader->SetUniformMat4f("model", modelMatrix_X_Cone);
 	coneVA->Bind();
 	glDrawElements(GL_TRIANGLES, coneVA->GetIndicesCount(), GL_UNSIGNED_INT, 0);
 
-	// YÃà
+	// Yì¶•
 	gizmoShader->SetUniformVec4("color", { 0.0f, 1.0f, 0.0f, 1.0f });
-	// ¿ø±âµÕ (¸öÅë)
+	// ì›ê¸°ë‘¥ (ëª¸í†µ)
 	glm::mat4 modelMatrix_Y_Cyl = glm::translate(glm::mat4(1.0f), objectPosition) * objectRotationMatrix * glm::translate(glm::mat4(1.0f), { 0.0f, gizmoLineLength / 2.0f, 0.0f }) * glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), { 1.0f, 0.0f, 0.0f }) * glm::scale(glm::mat4(1.0f), { gizmoLineRadius, gizmoLineRadius, gizmoLineLength });
 	gizmoShader->SetUniformMat4f("model", modelMatrix_Y_Cyl);
 	cylinderVA->Bind();
 	glDrawElements(GL_TRIANGLES, cylinderVA->GetIndicesCount(), GL_UNSIGNED_INT, 0);
-	// ¿ø»Ô (È­»ìÃË)
+	// ì›ë¿” (í™”ì‚´ì´‰)
 	glm::mat4 modelMatrix_Y_Cone = glm::translate(glm::mat4(1.0f), objectPosition) * objectRotationMatrix * glm::translate(glm::mat4(1.0f), { 0.0f, gizmoLineLength, 0.0f }) * glm::scale(glm::mat4(1.0f), { gizmoArrowHeadRadius, gizmoArrowHeadLength, gizmoArrowHeadRadius });
 	gizmoShader->SetUniformMat4f("model", modelMatrix_Y_Cone);
 	coneVA->Bind();
 	glDrawElements(GL_TRIANGLES, coneVA->GetIndicesCount(), GL_UNSIGNED_INT, 0);
 
-	// ZÃà
+	// Zì¶•
 	gizmoShader->SetUniformVec4("color", { 0.0f, 0.0f, 1.0f, 1.0f });
-	// ¿ø±âµÕ (¸öÅë)
+	// ì›ê¸°ë‘¥ (ëª¸í†µ)
 	glm::mat4 modelMatrix_Z_Cyl = glm::translate(glm::mat4(1.0f), objectPosition) * objectRotationMatrix * glm::translate(glm::mat4(1.0f), { 0.0f, 0.0f, gizmoLineLength / 2.0f }) * glm::scale(glm::mat4(1.0f), { gizmoLineRadius, gizmoLineRadius, gizmoLineLength });
 	gizmoShader->SetUniformMat4f("model", modelMatrix_Z_Cyl);
 	cylinderVA->Bind();
 	glDrawElements(GL_TRIANGLES, cylinderVA->GetIndicesCount(), GL_UNSIGNED_INT, 0);
-	// ¿ø»Ô (È­»ìÃË)
+	// ì›ë¿” (í™”ì‚´ì´‰)
 	glm::mat4 modelMatrix_Z_Cone = glm::translate(glm::mat4(1.0f), objectPosition) * objectRotationMatrix * glm::translate(glm::mat4(1.0f), { 0.0f, 0.0f, gizmoLineLength }) * glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), { 1.0f, 0.0f, 0.0f }) * glm::scale(glm::mat4(1.0f), { gizmoArrowHeadRadius, gizmoArrowHeadLength, gizmoArrowHeadRadius });
 	gizmoShader->SetUniformMat4f("model", modelMatrix_Z_Cone);
 	coneVA->Bind();
 	glDrawElements(GL_TRIANGLES, coneVA->GetIndicesCount(), GL_UNSIGNED_INT, 0);
 
 
-	// ´ÙÀ½ ·»´õ¸µ¿¡ ¿µÇâÀ» ÁÖÁö ¾Êµµ·Ï ±íÀÌ Å×½ºÆ®¸¦ ´Ù½Ã È°¼ºÈ­
+	// ë‹¤ìŒ ë Œë”ë§ì— ì˜í–¥ì„ ì£¼ì§€ ì•Šë„ë¡ ê¹Šì´ í…ŒìŠ¤íŠ¸ë¥¼ ë‹¤ì‹œ í™œì„±í™”
 	glEnable(GL_DEPTH_TEST);
-	coneVA->UnBind(); // ¸¶Áö¸·¿¡ »ç¿ëÇÑ VAO ¾ğ¹ÙÀÎµå
+	coneVA->UnBind(); // ë§ˆì§€ë§‰ì— ì‚¬ìš©í•œ VAO ì–¸ë°”ì¸ë“œ
 }
 
 
@@ -386,7 +572,7 @@ void ObjectManager::RenderBoneHierarchy(Camera* camera)
 {
 	if (!bDrawSkeleton || !camera || !selectedObject) return;
 
-	// ¼±ÅÃµÈ ¿ÀºêÁ§Æ®¿¡ Animator ÄÄÆ÷³ÍÆ®°¡ ÀÖ´ÂÁö È®ÀÎ
+	// ì„ íƒëœ ì˜¤ë¸Œì íŠ¸ì— Animator ì»´í¬ë„ŒíŠ¸ê°€ ìˆëŠ”ì§€ í™•ì¸
 	if (selectedObject->HasComponent<Animator>())
 	{
 		Animator* animator = selectedObject->GetComponent<Animator>();
@@ -395,12 +581,12 @@ void ObjectManager::RenderBoneHierarchy(Camera* camera)
 
 		glDisable(GL_DEPTH_TEST);
 
-		// Animator·ÎºÎÅÍ ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ Àû¿ëµÈ »À Çà·Ä ¸ÊÀ» °¡Á®¿È
+		// Animatorë¡œë¶€í„° ì• ë‹ˆë©”ì´ì…˜ì´ ì ìš©ëœ ë¼ˆ í–‰ë ¬ ë§µì„ ê°€ì ¸ì˜´
 		const auto& animatedTransforms = animator->GetGlobalBoneTransforms();
-		// ¾Ö´Ï¸ŞÀÌ¼ÇÀÇ »À´ë °èÃş ±¸Á¶ÀÇ ·çÆ® ³ëµå¸¦ °¡Á®¿È
+		// ì• ë‹ˆë©”ì´ì…˜ì˜ ë¼ˆëŒ€ ê³„ì¸µ êµ¬ì¡°ì˜ ë£¨íŠ¸ ë…¸ë“œë¥¼ ê°€ì ¸ì˜´
 		const AssimpNodeData* rootNode = &animation->GetRootNode();
 
-		// »õ µ¥ÀÌÅÍ¸¦ »ç¿ëÇÏ¿© »À ±×¸®±â ½ÃÀÛ
+		// ìƒˆ ë°ì´í„°ë¥¼ ì‚¬ìš©í•˜ì—¬ ë¼ˆ ê·¸ë¦¬ê¸° ì‹œì‘
 		DrawBoneHierarchy(rootNode, animatedTransforms, camera);
 
 		glEnable(GL_DEPTH_TEST);
@@ -409,20 +595,30 @@ void ObjectManager::RenderBoneHierarchy(Camera* camera)
 
 void ObjectManager::DrawBoneHierarchy(const AssimpNodeData* node, const std::map<std::string, glm::mat4>& animatedTransforms, Camera* camera)
 {
-	// ÇöÀç ³ëµå ÀÌ¸§ÀÌ Animator°¡ Á¦°øÇÑ ¸Ê¿¡ ÀÖ´ÂÁö È®ÀÎ
+	// í˜„ì¬ ë…¸ë“œ ì´ë¦„ì´ Animatorê°€ ì œê³µí•œ ë§µì— ìˆëŠ”ì§€ í™•ì¸
 	if (animatedTransforms.count(node->name))
 	{
-		// T-Æ÷Áî Çà·Ä ´ë½Å, ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ Àû¿ëµÈ ¿ùµå º¯È¯ Çà·ÄÀ» °¡Á®¿È
+		// T-í¬ì¦ˆ í–‰ë ¬ ëŒ€ì‹ , ì• ë‹ˆë©”ì´ì…˜ì´ ì ìš©ëœ ì›”ë“œ ë³€í™˜ í–‰ë ¬ì„ ê°€ì ¸ì˜´
 		glm::mat4 globalTransform = animatedTransforms.at(node->name);
 
-		// ±âÁ¸ »À ±×¸®±â ·ÎÁ÷ (ÀÌÁ¦ ¾Ö´Ï¸ŞÀÌ¼ÇµÈ À§Ä¡¿¡ ´ÙÀÌ¾Æ¸óµå¸¦ ±×¸²)
+		// ê¸°ì¡´ ë¼ˆ ê·¸ë¦¬ê¸° ë¡œì§ (ì´ì œ ì• ë‹ˆë©”ì´ì…˜ëœ ìœ„ì¹˜ì— ë‹¤ì´ì•„ëª¬ë“œë¥¼ ê·¸ë¦¼)
 		if (debugShader && boneMesh)
 		{
 			debugShader->Bind();
 			debugShader->SetUniformMat4f("view", camera->GetViewMatrix());
 			debugShader->SetUniformMat4f("projection", camera->GetProjectionMatrix());
 			debugShader->SetUniform1i("useTexture", 0);
-			debugShader->SetUniformVec4("color", { 0.0f, 1.0f, 0.0f, 1.0f });
+
+			// ê¸°ë³¸ ìƒ‰ìƒì€ ë…¹ìƒ‰ìœ¼ë¡œ ì„¤ì •
+			glm::vec4 boneColor = { 0.0f, 1.0f, 0.0f, 1.0f };
+			// ë§Œì•½ í˜„ì¬ ê·¸ë¦¬ëŠ” ë¼ˆì˜ ì´ë¦„ì´ ì‚¬ìš©ìê°€ ì„ íƒí•œ ë¼ˆì™€ ê°™ë‹¤ë©´,
+			if (node->name == selectedBoneName)
+			{
+				// ìƒ‰ìƒì„ ë¹¨ê°„ìƒ‰ìœ¼ë¡œ ë³€ê²½
+				boneColor = { 1.0f, 0.0f, 0.0f, 1.0f };
+			}
+
+			debugShader->SetUniformVec4("color", boneColor);
 
 			glm::mat4 boneModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(globalTransform[3]));
 			boneModelMatrix = glm::scale(boneModelMatrix, glm::vec3(0.03f));
@@ -438,7 +634,7 @@ void ObjectManager::DrawBoneHierarchy(const AssimpNodeData* node, const std::map
 		}
 	}
 
-	// ÀÚ½Ä ³ëµåµé¿¡ ´ëÇØ Àç±Í È£Ãâ (aiNodeÀÇ mChildren ´ë½Å AssimpNodeDataÀÇ children »ç¿ë)
+	// ìì‹ ë…¸ë“œë“¤ì— ëŒ€í•´ ì¬ê·€ í˜¸ì¶œ (aiNodeì˜ mChildren ëŒ€ì‹  AssimpNodeDataì˜ children ì‚¬ìš©)
 	for (const auto& child : node->children)
 	{
 		DrawBoneHierarchy(&child, animatedTransforms, camera);

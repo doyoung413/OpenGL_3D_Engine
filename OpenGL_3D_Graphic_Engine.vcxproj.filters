@@ -123,6 +123,9 @@
     <ClCompile Include="engine\source\Animator.cpp">
       <Filter>Source Files\Engine\Component</Filter>
     </ClCompile>
+    <ClCompile Include="engine\source\AnimationStateMachine.cpp">
+      <Filter>Source Files\Engine\Component</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphic\include\IndexBuffer.hpp">
@@ -207,6 +210,9 @@
       <Filter>Source Files\Graphic</Filter>
     </ClInclude>
     <ClInclude Include="engine\include\Animator.hpp">
+      <Filter>Source Files\Engine\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\AnimationStateMachine.hpp">
       <Filter>Source Files\Engine\Component</Filter>
     </ClInclude>
   </ItemGroup>

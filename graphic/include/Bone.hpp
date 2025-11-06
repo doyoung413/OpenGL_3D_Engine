@@ -25,6 +25,9 @@ public:
     const std::string& GetBoneName() const { return name; }
     int GetBoneID() const { return id; }
 
+    glm::vec3 GetInterpolatedPosition(float animationTime);
+    glm::quat GetInterpolatedRotation(float animationTime);
+    glm::vec3 GetInterpolatedScale(float animationTime);
 private:
     glm::mat4 InterpolatePosition(float animationTime);
     glm::mat4 InterpolateRotation(float animationTime);

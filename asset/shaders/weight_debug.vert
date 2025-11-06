@@ -11,7 +11,7 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-const int MAX_BONES = 100;
+const int MAX_BONES = 256;
 uniform mat4 finalBonesMatrices[MAX_BONES];
 
 out vec4 vertWeights;

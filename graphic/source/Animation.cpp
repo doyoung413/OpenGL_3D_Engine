@@ -57,7 +57,6 @@ void Animation::ReadHierarchyData(AssimpNodeData& dest, const aiNode* src)
     assert(src);
     dest.name = src->mName.data;
     dest.transformation = ConvertMatrixToGLMFormat(src->mTransformation);
-    dest.childrenCount = src->mNumChildren;
 
     for (unsigned int i = 0; i < src->mNumChildren; i++)
     {
