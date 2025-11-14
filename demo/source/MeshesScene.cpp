@@ -25,6 +25,8 @@ void MeshesScene::Init()
 
     renderManager->LoadShader("basic", "asset/shaders/basic.vert", "asset/shaders/basic.frag");
     renderManager->LoadShader("weight_debug", "asset/shaders/weight_debug.vert", "asset/shaders/weight_debug.frag");
+    renderManager->LoadShader("pbr", "asset/shaders/pbr.vert", "asset/shaders/pbr.frag");
+
     renderManager->LoadTexture("wall", "asset/wall.jpg");
     renderManager->LoadTexture("container", "asset/container.jpg");
     renderManager->LoadTexture("backpack", "asset/models/backpack/diffuse.jpg");
@@ -53,14 +55,13 @@ void MeshesScene::Init()
         object->transform.SetPosition(-3.0f, 0.0f, 0.0f);
     });
 
-    // 구
+    // 구 (Pbr 테스트)
     objectManager->AddObject<Object>();
     objectManager->QueueObjectFunction(objectManager->FindObject(2), [&](Object* object) {
         object->SetName("Sphere");
         auto renderer = object->AddComponent<MeshRenderer>();
         renderer->CreateSphere();
-        renderer->SetShader("basic");
-        renderer->SetTexture("wall");
+        renderer->SetShader("pbr"); // "basic" -> "pbr"
         renderer->SetColor({ 0.8f, 0.8f, 1.0f, 1.0f });
         object->transform.SetPosition(-1.5f, 0.0f, 0.0f);
     });
@@ -233,6 +234,7 @@ void MeshesScene::Init()
         renderer->SetShader("basic");
         auto animator = object->AddComponent<Animator>();
         animator->SetEnableRootMotion(true);
+        animator->SetBakeOptions(RootMotionBakeOptions{ false,false,false,false });
         Model* model = renderer->GetModel();
         if (model)
         {
@@ -245,6 +247,7 @@ void MeshesScene::Init()
             fsm->ChangeState("Thriller_1", false);
         }
     });
+
 
     CameraManager* cameraManager = Engine::GetInstance().GetCameraManager();
     int index = cameraManager->CreateCamera();

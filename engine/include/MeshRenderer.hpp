@@ -44,6 +44,10 @@ public:
     void SetColor(const glm::vec4& color_) { color = color_; }
     const glm::vec4& GetColor() const { return color; }
 
+    void SetMetallic(float metallic_) { metallic = metallic_; }
+    float GetMetallic() { return metallic; }
+    void SetRoughness(float roughness_) { roughness = roughness_; }
+    float GetRoughness() { return roughness; }
 private:
     std::shared_ptr<Model> model; // 모델 파일 로딩용
     std::unique_ptr<Mesh> mesh;   // CreateCube 등 절차적 생성용
@@ -52,4 +56,6 @@ private:
     RenderMode renderMode = RenderMode::Fill;
 
     glm::vec4 color = glm::vec4(1.0f);
+    float metallic = 0.5f;
+    float roughness = 0.5f;
 };

@@ -198,11 +198,10 @@ void ObjectManager::ObjectControllerForImgui()
 			{
 				//if (!selectedObject)
 				{
+					MeshRenderer* renderer = selectedObject->GetComponent<MeshRenderer>();
 					if (ImGui::Button("ShowWeight"))
 					{
 						isWeightDebugMode = !isWeightDebugMode; // 모드 전환
-
-						MeshRenderer* renderer = selectedObject->GetComponent<MeshRenderer>();
 						if(renderer)
 						{
 							if (isWeightDebugMode)
@@ -229,6 +228,37 @@ void ObjectManager::ObjectControllerForImgui()
 					if (ImGui::Button("ShowSkeletonBone"))
 					{
 						bDrawSkeleton = !bDrawSkeleton;
+					}
+
+					ImGui::Separator();
+					ImGui::Text("Color");
+
+					// GetColor()는 const glm::vec4&를 반환
+					glm::vec4 currentColor = renderer->GetColor();
+					// ImGui 위젯은 float 배열을 사용
+					float colorArr[4] = { currentColor.r, currentColor.g, currentColor.b, currentColor.a };
+
+					// ImGui::ColorEdit4 위젯을 사용하여 색상(RGBA)을 편집
+					if (ImGui::ColorEdit4("Color", colorArr))
+					{
+						// 위젯 값이 변경되면 SetColor 함수를 즉시 호출
+						renderer->SetColor({ colorArr[0], colorArr[1], colorArr[2], colorArr[3] });
+					}
+
+					ImGui::Separator();
+					ImGui::Text("Material Properties");
+
+					float currentMetallic = renderer->GetMetallic();
+					if (ImGui::SliderFloat("Metallic", &currentMetallic, 0.0f, 1.0f))
+					{
+						renderer->SetMetallic(currentMetallic);
+					}
+
+					// Roughness
+					float currentRoughness = renderer->GetRoughness();
+					if (ImGui::SliderFloat("Roughness", &currentRoughness, 0.0f, 1.0f))
+					{
+						renderer->SetRoughness(currentRoughness);
 					}
 				}
 			}

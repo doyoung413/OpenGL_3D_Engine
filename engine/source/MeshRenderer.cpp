@@ -82,6 +82,14 @@ void MeshRenderer::Render(Camera* camera, Light* light)
         shader->SetUniformVec4("color", color);
     }
 
+    // 셰이더가 "metallic" 유니폼을 가지고 있을 때만 값을 전달합니다.
+    if (shader->HasUniform("metallic")) {
+        shader->SetUniform1f("metallic", metallic);
+    }
+    if (shader->HasUniform("roughness")) {
+        shader->SetUniform1f("roughness", roughness);
+    }
+
     // 조명 유니폼 설정
     // 빛이 존재하고, 셰이더가 lightPos 유니폼을 사용할 때만 실행
     if (light && shader->HasUniform("lightPos"))

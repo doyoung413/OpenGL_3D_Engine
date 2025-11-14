@@ -48,17 +48,17 @@ void Animator::Update(float dt)
 	{
 		float prevDuration = previousAnimation->GetDuration();
 
-		// 이전 애니메이션의 시간도 계속 업데이트합니다.
+		// 이전 애니메이션의 시간도 계속 업데이트
 		previousTime += previousAnimation->GetTicksPerSecond() * dt;
 
-		// 1b-1. 시간이 0보다 작아지는 것을 방지합니다.
+		// 1b-1. 시간이 0보다 작아지는 것을 방지
 		if (previousTime < 0.0f) {
 			previousTime = 0.0f;
 		}
 
-		// 시간이 애니메이션의 총 길이를 초과하지 못하도록 '고정(Clamp)'합니다. 
+		// 시간이 애니메이션의 총 길이를 초과하지 못하도록 고정(Clamp)
 		// duration(경계 값) 대신, duration - 0.01f (안전한 마지막 값)으로 고정하여
-		// NaN 값 발생(뼈 꼬임 및 워프)을 원천적으로 차단합니다.
+		// NaN 값 발생(뼈 꼬임 및 워프)을 원천적으로 차단
 		if (previousTime > prevDuration)
 		{
 			previousTime = prevDuration - 0.01f;
@@ -92,7 +92,6 @@ void Animator::Update(float dt)
 		// 블렌딩 중이라면 '이전' 애니메이션의 목표 Transform도 계산
 		if (blendFactor < 1.0f && previousAnimation)
 		{
-			// 이제 previousTime은 항상 유효한(안전한) 값이므로 NaN이 발생하지 않습니다.
 			glm::mat4 previousTarget = CalculateAbsoluteRootMotion(previousAnimation, previousTime, previousRootMotionStartTransform);
 
 			// 두 Transform을 분해하여 위치(mix)와 회전(slerp)을 보간
@@ -167,13 +166,13 @@ void Animator::PlayAnimation(Animation* newAnimation, bool isLoop, float speed, 
 	justLooped = false;
 	playbackState = PlaybackState::Playing;
 
-	// [중요] 새 애니메이션의 루트 모션 시작점을 '현재' 오브젝트 위치로 갱신
+	// 새 애니메이션의 루트 모션 시작점을 '현재' 오브젝트 위치로 갱신
 	if (enableRootMotion && owner)
 	{
 		rootMotionStartTransform = owner->transform.GetModelMatrix();
 	}
 
-	// 루트 뼈 자동 감지 로직 (이전 코드에서 복원)
+	// 루트 뼈 자동 감지 로직
 	if (enableRootMotion && rootBoneName.empty() && newAnimation)
 	{
 		const std::vector<std::string> commonRootNames = { "Hips", "hips", "Root", "root" };
