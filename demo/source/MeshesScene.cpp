@@ -9,6 +9,7 @@
 #include "CameraManager.hpp"
 #include "Light.hpp"
 #include "Shader.hpp"
+#include "Texture.hpp"
 
 #include "Animator.hpp"
 #include "Animation.hpp"
@@ -27,9 +28,21 @@ void MeshesScene::Init()
     renderManager->LoadShader("weight_debug", "asset/shaders/weight_debug.vert", "asset/shaders/weight_debug.frag");
     renderManager->LoadShader("pbr", "asset/shaders/pbr.vert", "asset/shaders/pbr.frag");
 
+    // IBL 사전 연산용 셰이더 로드
+    renderManager->LoadShader("skybox", "asset/shaders/skybox.vert", "asset/shaders/equirectangular.frag"); // Pass 1용
+    renderManager->LoadShader("irradiance", "asset/shaders/skybox.vert", "asset/shaders/irradiance.frag"); // Pass 2용
+    renderManager->LoadShader("prefilter", "asset/shaders/skybox.vert", "asset/shaders/prefilter.frag"); // Pass 3용
+
     renderManager->LoadTexture("wall", "asset/wall.jpg");
     renderManager->LoadTexture("container", "asset/container.jpg");
     renderManager->LoadTexture("backpack", "asset/models/backpack/diffuse.jpg");
+
+    // HDR 텍스처 로드 (경로는 실제 파일에 맞게 수정)
+    std::string hdrPath = "asset/hdr/modern_evening_street_4k.hdr";
+    renderManager->LoadTexture("hdr_env", hdrPath);
+
+    // [추가] IBL 사전 연산 실행
+    PrecomputeIBL(hdrPath);
 
     // 평면
     objectManager->AddObject<Object>();
@@ -234,7 +247,6 @@ void MeshesScene::Init()
         renderer->SetShader("basic");
         auto animator = object->AddComponent<Animator>();
         animator->SetEnableRootMotion(true);
-        animator->SetBakeOptions(RootMotionBakeOptions{ false,false,false,false });
         Model* model = renderer->GetModel();
         if (model)
         {
@@ -294,6 +306,17 @@ void MeshesScene::Restart()
 
 void MeshesScene::End()
 {
+    // IBL 유틸리티 메쉬 메모리 해제
+    skyboxCube.reset();
+
+    // IBL 텍스처 메모리 해제
+    glDeleteTextures(1, &envCubemap);
+    glDeleteTextures(1, &irradianceMap);
+    glDeleteTextures(1, &prefilterMap);
+    envCubemap = 0;
+    irradianceMap = 0;
+    prefilterMap = 0;
+
     Engine::GetInstance().GetObjectManager()->DestroyAllObjects();
     Engine::GetInstance().GetRenderManager()->ResetAllResources();
 }
@@ -411,4 +434,175 @@ void MeshesScene::PostRender(Camera* camera)
 void MeshesScene::RenderImGui()
 {
     Engine::GetInstance().GetObjectManager()->ObjectControllerForImgui();
+}
+
+void MeshesScene::PrecomputeIBL(const std::string& hdrTexturePath)
+{
+    RenderManager* renderManager = Engine::GetInstance().GetRenderManager();
+    Texture* hdrTexture = renderManager->GetTexture("hdr_env").get();
+    if (!hdrTexture) {
+        std::cerr << "Failed to load HDR texture for IBL." << std::endl;
+        return;
+    }
+
+    // 유틸리티 생성: FBO, RBO, 큐브 메쉬
+    unsigned int captureFBO, captureRBO;
+    glGenFramebuffers(1, &captureFBO);
+    glGenRenderbuffers(1, &captureRBO);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
+    glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512); // 큐브맵 최대 해상도
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
+
+    // 큐브 메쉬 생성 (CreateFromData 사용)
+    std::vector<Vertex> skyboxVertices = {
+        {{-1.0f,  1.0f, -1.0f}}, {{-1.0f, -1.0f, -1.0f}}, {{ 1.0f, -1.0f, -1.0f}},
+        {{ 1.0f, -1.0f, -1.0f}}, {{ 1.0f,  1.0f, -1.0f}}, {{-1.0f,  1.0f, -1.0f}},
+        {{-1.0f, -1.0f,  1.0f}}, {{-1.0f, -1.0f, -1.0f}}, {{-1.0f,  1.0f, -1.0f}},
+        {{-1.0f,  1.0f, -1.0f}}, {{-1.0f,  1.0f,  1.0f}}, {{-1.0f, -1.0f,  1.0f}},
+        {{ 1.0f, -1.0f, -1.0f}}, {{ 1.0f, -1.0f,  1.0f}}, {{ 1.0f,  1.0f,  1.0f}},
+        {{ 1.0f,  1.0f,  1.0f}}, {{ 1.0f,  1.0f, -1.0f}}, {{ 1.0f, -1.0f, -1.0f}},
+        {{-1.0f, -1.0f,  1.0f}}, {{-1.0f,  1.0f,  1.0f}}, {{ 1.0f,  1.0f,  1.0f}},
+        {{ 1.0f,  1.0f,  1.0f}}, {{ 1.0f, -1.0f,  1.0f}}, {{-1.0f, -1.0f,  1.0f}},
+        {{-1.0f,  1.0f, -1.0f}}, {{ 1.0f,  1.0f, -1.0f}}, {{ 1.0f,  1.0f,  1.0f}},
+        {{ 1.0f,  1.0f,  1.0f}}, {{-1.0f,  1.0f,  1.0f}}, {{-1.0f,  1.0f, -1.0f}},
+        {{-1.0f, -1.0f, -1.0f}}, {{-1.0f, -1.0f,  1.0f}}, {{ 1.0f, -1.0f, -1.0f}},
+        {{ 1.0f, -1.0f, -1.0f}}, {{-1.0f, -1.0f,  1.0f}}, {{ 1.0f, -1.0f,  1.0f}}
+    };
+    std::vector<unsigned int> skyboxIndices(36);
+    for (int i = 0; i < 36; ++i) skyboxIndices[i] = i;
+    skyboxCube = std::make_shared<Mesh>(skyboxVertices, skyboxIndices);
+    skyboxCube->UploadToGPU(); // VAO 생성
+
+    // 환경 큐브맵 (envCubemap) 생성
+    unsigned int envMapSize = 512;
+    glGenTextures(1, &envCubemap);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
+    for (int i = 0; i < 6; ++i) {
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, envMapSize, envMapSize, 0, GL_RGB, GL_FLOAT, nullptr);
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // 밉맵 사용
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // 캡처용 View / Projection 행렬 설정
+    glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+    glm::mat4 captureViews[] = {
+       glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+       glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+       glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
+       glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
+       glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+       glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
+    };
+
+    // (Pass 1) Equirectangular -> Cubemap
+    std::shared_ptr<Shader> equirectangularShader = renderManager->GetShader("skybox");
+    equirectangularShader->Bind();
+    equirectangularShader->SetUniformMat4f("projection", captureProjection);
+    hdrTexture->Bind(0);
+    equirectangularShader->SetUniform1i("equirectangularMap", 0);
+
+    glViewport(0, 0, envMapSize, envMapSize);
+    glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
+    for (int i = 0; i < 6; ++i) {
+        equirectangularShader->SetUniformMat4f("view", captureViews[i]);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap, 0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        skyboxCube->GetVertexArray()->Bind();
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
+    glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
+    glGenerateMipmap(GL_TEXTURE_CUBE_MAP); // 밉맵 생성
+
+    // (Pass 2) Irradiance Map 생성
+    unsigned int irradianceMapSize = 32;
+    glGenTextures(1, &irradianceMap);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
+    for (int i = 0; i < 6; ++i) {
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, irradianceMapSize, irradianceMapSize, 0, GL_RGB, GL_FLOAT, nullptr);
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, irradianceMapSize, irradianceMapSize);
+    glViewport(0, 0, irradianceMapSize, irradianceMapSize);
+
+    std::shared_ptr<Shader> irradianceShader = renderManager->GetShader("irradiance");
+    irradianceShader->Bind();
+    irradianceShader->SetUniformMat4f("projection", captureProjection);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap); // Pass 1의 결과물
+    irradianceShader->SetUniform1i("environmentMap", 0);
+
+    for (int i = 0; i < 6; ++i) {
+        irradianceShader->SetUniformMat4f("view", captureViews[i]);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradianceMap, 0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        skyboxCube->GetVertexArray()->Bind();
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
+
+    // (Pass 3) Pre-filtered Specular Map 생성
+    unsigned int prefilterMapSize = 128;
+    glGenTextures(1, &prefilterMap);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
+    for (int i = 0; i < 6; ++i) {
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, prefilterMapSize, prefilterMapSize, 0, GL_RGB, GL_FLOAT, nullptr);
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // 밉맵 레벨간 선형보간
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glGenerateMipmap(GL_TEXTURE_CUBE_MAP); // 밉맵 레벨 생성
+
+    std::shared_ptr<Shader> prefilterShader = renderManager->GetShader("prefilter");
+    prefilterShader->Bind();
+    prefilterShader->SetUniformMat4f("projection", captureProjection);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap); // Pass 1의 결과물
+    prefilterShader->SetUniform1i("environmentMap", 0);
+
+    unsigned int maxMipLevels = 5;
+    for (int mip = 0; mip < maxMipLevels; ++mip) {
+        // 밉맵 레벨에 따라 뷰포트 크기 조절
+        unsigned int mipWidth = static_cast<unsigned int>(prefilterMapSize * std::pow(0.5, mip));
+        unsigned int mipHeight = static_cast<unsigned int>(prefilterMapSize * std::pow(0.5, mip));
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mipWidth, mipHeight);
+        glViewport(0, 0, mipWidth, mipHeight);
+
+        float roughness = (float)mip / (float)(maxMipLevels - 1);
+        prefilterShader->SetUniform1f("roughness", roughness);
+
+        for (int i = 0; i < 6; ++i) {
+            prefilterShader->SetUniformMat4f("view", captureViews[i]);
+            // 밉맵 레벨 'mip'에 렌더링
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilterMap, mip);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            skyboxCube->GetVertexArray()->Bind();
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+    }
+
+    // 정리
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDeleteFramebuffers(1, &captureFBO);
+    glDeleteRenderbuffers(1, &captureRBO);
+
+    // 뷰포트 원상복구
+    int w = Engine::GetInstance().GetWindowWidth();
+    int h = Engine::GetInstance().GetWindowHeight();
+    glViewport(0, 0, w, h);
+
+    std::cout << "[IBL] Pre-computation finished. envCubemap, irradianceMap, prefilterMap generated." << std::endl;
 }

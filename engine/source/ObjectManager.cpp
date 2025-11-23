@@ -231,8 +231,6 @@ void ObjectManager::ObjectControllerForImgui()
 					}
 
 					ImGui::Separator();
-					ImGui::Text("Color");
-
 					// GetColor()는 const glm::vec4&를 반환
 					glm::vec4 currentColor = renderer->GetColor();
 					// ImGui 위젯은 float 배열을 사용

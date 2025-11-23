@@ -28,4 +28,7 @@ private:
     std::string filePath;
     glm::ivec2 size{ 0,0 };
     int bpp = 0; // BPP: Bits Per Pixel
+
+    GLenum internalFormat = GL_RGBA8;
+    GLenum dataFormat = GL_RGBA;
 };
