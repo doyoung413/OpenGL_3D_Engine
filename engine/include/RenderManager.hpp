@@ -5,6 +5,24 @@
 #include <unordered_map>
 #include "glm.hpp"
 
+enum class TextureSlot
+{
+    // Material (0~4)
+    ALBEDO = 0,
+    NORMAL = 1,
+    METALLIC = 2,
+    ROUGHNESS = 3,
+    AO = 4,
+
+    // Shadow (5~9)
+    SHADOW_MAP = 5,
+
+    // Global IBL (10~12)
+    IBL_IRRADIANCE = 10,
+    IBL_PREFILTER = 11,
+    IBL_BRDF_LUT = 12
+};
+
 class Engine;
 class Shader;  
 class Texture;

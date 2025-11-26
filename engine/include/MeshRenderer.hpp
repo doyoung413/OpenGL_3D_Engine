@@ -48,6 +48,8 @@ public:
     float GetMetallic() { return metallic; }
     void SetRoughness(float roughness_) { roughness = roughness_; }
     float GetRoughness() { return roughness; }
+    void SetExposure(float exp) { exposure = exp; }
+    float GetExposure() const { return exposure; }
 private:
     std::shared_ptr<Model> model; // 모델 파일 로딩용
     std::unique_ptr<Mesh> mesh;   // CreateCube 등 절차적 생성용
@@ -57,5 +59,6 @@ private:
 
     glm::vec4 color = glm::vec4(1.0f);
     float metallic = 0.5f;
-    float roughness = 0.5f;
+    float roughness = 0.5f; 
+    float exposure = 0.5f;
 };

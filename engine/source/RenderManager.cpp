@@ -34,7 +34,19 @@ void RenderManager::Render()
 
     if (!cameraManager) return;
 
-    // CameraManager가 관리하는 모든 카메라 리스트를 가져옴
+    // 깊이 버퍼 쓰기/테스트 허용
+    glDepthMask(GL_TRUE);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+
+    // 면 제거(Culling) 끄기
+    glDisable(GL_CULL_FACE);
+
+    // 블렌딩 켜기
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // CameraManager가 관리하는 모든 카메라 리스트를 가져wkf옴
     auto& cameraList = cameraManager->GetCameraList();
 
     // 등록된 모든 카메라에 대해 업데이트

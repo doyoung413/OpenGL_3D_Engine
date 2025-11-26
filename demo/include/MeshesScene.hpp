@@ -2,6 +2,7 @@
 #include <memory>
 #include <string>
 #include "Scene.hpp"
+#include "Skybox.hpp"
 
 class Object;
 class Mesh;
@@ -23,12 +24,5 @@ private:
     void HandleInputTests();
     void HandleCameraInput(float dt);
 
-    // IBL 사전 연산을 위한 헬퍼 함수
-    void PrecomputeIBL(const std::string& hdrTexturePath);
-
-    // IBL 텍스처 핸들 및 유틸리티
-    unsigned int envCubemap = 0;
-    unsigned int irradianceMap = 0;
-    unsigned int prefilterMap = 0;
-    std::shared_ptr<Mesh> skyboxCube;
+    std::unique_ptr<Skybox> skybox;
 };

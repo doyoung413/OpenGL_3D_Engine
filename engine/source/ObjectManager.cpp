@@ -145,15 +145,13 @@ void ObjectManager::ObjectControllerForImgui()
 					{
 						renderer->SetShader(prevShader);
 					}
-					else
-					{
-						renderer->SetShader("basic");
-					}
 				}
 			}
 			selectedBoneName = "";
-			bDrawSkeleton = false;
+			bDrawSkeleton = false; 
+			isWeightDebugMode = false;
 			prevShader = nullptr;
+
 			selectedObject = currentObject;
 		}
 	}
@@ -252,11 +250,16 @@ void ObjectManager::ObjectControllerForImgui()
 						renderer->SetMetallic(currentMetallic);
 					}
 
-					// Roughness
 					float currentRoughness = renderer->GetRoughness();
 					if (ImGui::SliderFloat("Roughness", &currentRoughness, 0.0f, 1.0f))
 					{
 						renderer->SetRoughness(currentRoughness);
+					}
+
+					float currentExposure = renderer->GetExposure();
+					if (ImGui::DragFloat("Exposure", &currentExposure, 0.01f, 0.0f, 10.0f))
+					{
+						renderer->SetExposure(currentExposure);
 					}
 				}
 			}
@@ -306,7 +309,7 @@ void ObjectManager::ObjectControllerForImgui()
 						light->SetShininess(shininess);
 					}
 				}
-				else
+				else if (light->GetType() == LightType::Directional)
 				{
 					ImGui::Text("Type: Directional Light");
 					glm::vec3 direction = light->GetDirection();
@@ -518,7 +521,9 @@ void ObjectManager::RenderGizmos(Camera* camera)
 		return;
 	}
 
-	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH_TEST); 
+	glDepthMask(GL_FALSE); 
+	glDisable(GL_CULL_FACE);
 
 	gizmoShader->Bind();
 	gizmoShader->SetUniformMat4f("view", camera->GetViewMatrix());
@@ -581,7 +586,10 @@ void ObjectManager::RenderGizmos(Camera* camera)
 
 
 	// 다음 렌더링에 영향을 주지 않도록 깊이 테스트를 다시 활성화
+	glDepthMask(GL_TRUE); 
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+
 	coneVA->UnBind(); // 마지막에 사용한 VAO 언바인드
 }
 

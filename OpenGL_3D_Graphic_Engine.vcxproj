@@ -162,6 +162,7 @@ copy "$(ProjectDir)\libs\Assimp\bin\Release\assimp-vc143-mt.dll" "$(OutDir)" </C
     <ClCompile Include="graphic\source\Mesh.cpp" />
     <ClCompile Include="graphic\source\Model.cpp" />
     <ClCompile Include="graphic\source\Shader.cpp" />
+    <ClCompile Include="graphic\source\Skybox.cpp" />
     <ClCompile Include="graphic\source\Texture.cpp" />
     <ClCompile Include="graphic\source\VertexArray.cpp" />
     <ClCompile Include="graphic\source\VertexBuffer.cpp" />
@@ -199,6 +200,7 @@ copy "$(ProjectDir)\libs\Assimp\bin\Release\assimp-vc143-mt.dll" "$(OutDir)" </C
     <ClInclude Include="graphic\include\Mesh.hpp" />
     <ClInclude Include="graphic\include\Model.hpp" />
     <ClInclude Include="graphic\include\Shader.hpp" />
+    <ClInclude Include="graphic\include\Skybox.hpp" />
     <ClInclude Include="graphic\include\Texture.hpp" />
     <ClInclude Include="graphic\include\VertexArray.hpp" />
     <ClInclude Include="graphic\include\VertexBuffer.hpp" />

@@ -54,6 +54,20 @@ void MeshRenderer::Render(Camera* camera, Light* light)
     shader->SetUniformMat4f("view", viewMat);
     shader->SetUniformMat4f("projection", projectionMat);
 
+    // 셰이더가 IBL 유니폼을 가지고 있다면 슬롯 번호를 설정
+    if (shader->HasUniform("irradianceMap")) 
+    {
+        shader->SetUniform1i("irradianceMap", static_cast<int>(TextureSlot::IBL_IRRADIANCE));
+    }
+    if (shader->HasUniform("prefilterMap")) 
+    {
+        shader->SetUniform1i("prefilterMap", static_cast<int>(TextureSlot::IBL_PREFILTER));
+    }
+    if (shader->HasUniform("brdfLUT")) 
+    {
+        shader->SetUniform1i("brdfLUT", static_cast<int>(TextureSlot::IBL_BRDF_LUT));
+    }
+
     // 애니메이션 유니폼 설정
     // 셰이더가 finalBonesMatrices를 사용하고, 이 오브젝트에 Animator가 있을 때만 실행
     if (shader->HasUniform("finalBonesMatrices") && GetOwner()->HasComponent<Animator>())
@@ -67,27 +81,36 @@ void MeshRenderer::Render(Camera* camera, Light* light)
     // 셰이더가 useTexture 유니폼을 사용할 때만 실행
     if (shader->HasUniform("useTexture"))
     {
-        if (texture) {
+        if (texture) 
+        {
             shader->SetUniform1i("useTexture", 1);
             texture->Bind(0);
             shader->SetUniform1i("Texture", 0);
         }
-        else {
+        else 
+        {
             shader->SetUniform1i("useTexture", 0);
         }
     }
 
     // 셰이더가 color 유니폼을 사용할 때만 실행
-    if (shader->HasUniform("color")) {
+    if (shader->HasUniform("color")) 
+    {
         shader->SetUniformVec4("color", color);
     }
 
-    // 셰이더가 "metallic" 유니폼을 가지고 있을 때만 값을 전달합니다.
-    if (shader->HasUniform("metallic")) {
+    // PBR용 유니폼
+    if (shader->HasUniform("metallic")) 
+    {
         shader->SetUniform1f("metallic", metallic);
     }
-    if (shader->HasUniform("roughness")) {
+    if (shader->HasUniform("roughness")) 
+    {
         shader->SetUniform1f("roughness", roughness);
+    }
+    if (shader->HasUniform("exposure")) 
+    {
+        shader->SetUniform1f("exposure", exposure);
     }
 
     // 조명 유니폼 설정

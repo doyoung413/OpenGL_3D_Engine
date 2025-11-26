@@ -126,6 +126,9 @@
     <ClCompile Include="engine\source\AnimationStateMachine.cpp">
       <Filter>Source Files\Engine\Component</Filter>
     </ClCompile>
+    <ClCompile Include="graphic\source\Skybox.cpp">
+      <Filter>Source Files\Graphic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphic\include\IndexBuffer.hpp">
@@ -214,6 +217,9 @@
     </ClInclude>
     <ClInclude Include="engine\include\AnimationStateMachine.hpp">
       <Filter>Source Files\Engine\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="graphic\include\Skybox.hpp">
+      <Filter>Source Files\Graphic</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
