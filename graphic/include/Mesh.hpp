@@ -37,9 +37,9 @@ public:
 
     void CreatePlane();
     void CreateCube();
-    void CreateSphere();
-    void CreateDiamond();
-    void CreateCylinder();
+    void CreateSphere(int stacks = 18, int slices = 36);
+    void CreateDiamond(); 
+    void CreateCylinder(int segments_= 32);
     void CreateCapsule();
     void CreateCone();
 

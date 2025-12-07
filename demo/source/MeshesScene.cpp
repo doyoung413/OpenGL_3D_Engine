@@ -28,9 +28,6 @@ void MeshesScene::Init()
     renderManager->LoadShader("weight_debug", "asset/shaders/weight_debug.vert", "asset/shaders/weight_debug.frag");
     renderManager->LoadShader("pbr", "asset/shaders/pbr.vert", "asset/shaders/pbr.frag");
 
-    skybox = std::make_unique<Skybox>();
-    skybox->Init("asset/hdr/modern_evening_street_4k.hdr");
-
     renderManager->LoadTexture("wall", "asset/wall.jpg");
     renderManager->LoadTexture("container", "asset/container.jpg");
     renderManager->LoadTexture("backpack", "asset/models/backpack/diffuse.jpg");
@@ -179,14 +176,13 @@ void MeshesScene::Init()
 
         auto lightComp = object->AddComponent<Light>();
         lightComp->SetColor({ 0.0f, 1.0f, 0.0f });
-        //lightComp->SetOffsetForPointL({ 0.0f, 0.0f, 2.0f });
         lightComp->SetType(LightType::Point);
 
-        //auto renderer = object->AddComponent<MeshRenderer>();
-        //renderer->CreateSphere();
-        //renderer->SetShader("basic");
-        //renderer->SetColor({ 0.0f, 1.0f, 0.0f, 1.0f });
-        //object->transform.SetScale(0.2f, 0.2f, 0.2f);
+        auto renderer = object->AddComponent<MeshRenderer>();
+        renderer->CreateSphere();
+        renderer->SetShader("basic");
+        renderer->SetColor({ 0.0f, 1.0f, 0.0f, 1.0f });
+        object->transform.SetScale(0.2f, 0.2f, 0.2f);
     });
 
     // 직접 조명
@@ -200,58 +196,7 @@ void MeshesScene::Init()
         lightComp->SetType(LightType::Directional);
         lightComp->SetDirection({ -0.2f, -1.0f, -0.3f });
     });
-
-    //애니메이션 오브젝트
-    objectManager->AddObject<Object>();
-    objectManager->QueueObjectFunction(objectManager->FindObject(11), [this](Object* object) {
-        object->SetName("AnimationObject");
-        object->transform.SetPosition(0.0f, -0.5f, -1.25f);
-        object->transform.SetRotationY(180.f);
-        object->transform.SetScale(0.01f, 0.01f, 0.01f);
-
-        auto renderer = object->AddComponent<MeshRenderer>();
-        renderer->LoadModel("asset/models/Test.fbx", "mixamorig:Hips");
-        renderer->SetShader("basic");
-        object->AddComponent<Animator>();
-        Model* model = renderer->GetModel();
-        if (model)
-        {
-            auto fsm = object->AddComponent<AnimationStateMachine>();
-
-            fsm->AddState("Walk", "asset/models/Walking_1.fbx");
-            fsm->AddState("Punch", "asset/models/Quad Punch.fbx");
-            fsm->AddState("Dance", "asset/models/Swing Dancing.fbx");
-            fsm->ChangeState("Punch");
-        }
-    });
-
-    //춤 애니메이션 오브젝트
-    objectManager->AddObject<Object>();
-    objectManager->QueueObjectFunction(objectManager->FindObject(12), [this](Object* object) {
-        object->SetName("DancingObject");
-        object->transform.SetPosition(2.0f, 0.5f, -1.25f);
-        object->transform.SetRotationY(180.f);
-        object->transform.SetScale(0.01f, 0.01f, 0.01f);
-
-        auto renderer = object->AddComponent<MeshRenderer>();
-        renderer->LoadModel("asset/models/character.fbx", "mixamorig:Hips");
-        renderer->SetShader("basic");
-        auto animator = object->AddComponent<Animator>();
-        animator->SetEnableRootMotion(true);
-        Model* model = renderer->GetModel();
-        if (model)
-        {
-            auto fsm = object->AddComponent<AnimationStateMachine>();
-
-            fsm->AddState("Thriller_1", "asset/models/Thriller_1.fbx");
-            fsm->AddState("Thriller_2", "asset/models/Thriller_2.fbx");
-            fsm->AddState("Thriller_3", "asset/models/Thriller_3.fbx");
-            fsm->AddState("Thriller_4", "asset/models/Thriller_4.fbx");
-            fsm->ChangeState("Thriller_1", false);
-        }
-    });
-
-
+    
     CameraManager* cameraManager = Engine::GetInstance().GetCameraManager();
     int index = cameraManager->CreateCamera();
     Camera* camera = cameraManager->GetCamera(index);
@@ -265,36 +210,6 @@ void MeshesScene::Update(float dt)
 {
     HandleInputTests();
     HandleCameraInput(dt);
-
-    Object* character = Engine::GetInstance().GetObjectManager()->FindObjectByName("DancingObject");
-    if (character)
-    {
-        auto fsm = character->GetComponent<AnimationStateMachine>();
-        auto animator = character->GetComponent<Animator>();
-
-
-        if (fsm->GetCurrentStateName() == "Thriller_1" && animator->GetPlaybackState() == PlaybackState::Stopped)
-        {
-            fsm->ChangeState("Thriller_2", false, 1.0f, 0.25f);
-        }
-        else if (fsm->GetCurrentStateName() == "Thriller_2" && animator->GetPlaybackState() == PlaybackState::Stopped)
-        {
-            fsm->ChangeState("Thriller_3", false, 1.0f, 0.25f);
-        }
-        else if (fsm->GetCurrentStateName() == "Thriller_3" && animator->GetPlaybackState() == PlaybackState::Stopped)
-        {
-            fsm->ChangeState("Thriller_4", false, 1.0f, 0.25f);
-        }
-        else if (fsm->GetCurrentStateName() == "Thriller_4" && animator->GetPlaybackState() == PlaybackState::Stopped)
-        {
-            fsm->ChangeState("Thriller_1", false, 1.0f, 0.25f);
-        }
-    }
-
-    if (skybox) 
-    {
-        skybox->BindIBL();
-    }
 }
 void MeshesScene::Restart()
 {
@@ -304,6 +219,7 @@ void MeshesScene::End()
 {
     Engine::GetInstance().GetObjectManager()->DestroyAllObjects();
     Engine::GetInstance().GetRenderManager()->ResetAllResources();
+    Engine::GetInstance().GetCameraManager()->ClearCameras();
 }
 
 void MeshesScene::HandleInputTests()
@@ -333,12 +249,6 @@ void MeshesScene::HandleInputTests()
     {
         std::cout << "[Mouse Wheel] Scrolled, Y-motion: " << wheelMotion.y << std::endl;
     }
-    if (input->IsKeyPressOnce(KEYBOARDKEYS::R))
-    {
-        bool currentMode = input->GetRelativeMouseMode();
-        input->SetRelativeMouseMode(!currentMode);
-        std::cout << "[System] Relative Mouse Mode Toggled to " << (!currentMode ? "ON" : "OFF") << std::endl;
-    }
     if (input->GetRelativeMouseMode())
     {
         glm::vec2 motion = input->GetRelativeMouseMotion();
@@ -347,6 +257,9 @@ void MeshesScene::HandleInputTests()
             std::cout << "[Mouse Motion] Relative delta (" << motion.x << ", " << motion.y << ")" << std::endl;
         }
     }
+
+    if (input->IsMouseButtonPressOnce(MOUSEBUTTON::RIGHT)) input->SetRelativeMouseMode(true);
+    if (input->IsMouseButtonReleasedOnce(MOUSEBUTTON::RIGHT)) input->SetRelativeMouseMode(false);
 
     if (input->IsKeyPressOnce(KEYBOARDKEYS::F11))
     {
@@ -411,12 +324,9 @@ void MeshesScene::HandleCameraInput(float dt)
 
 void MeshesScene::PostRender(Camera* camera)
 {
-    if (skybox) {
-        skybox->Render(camera);
-    }
-
     Engine::GetInstance().GetObjectManager()->RenderGizmos(camera);
     Engine::GetInstance().GetObjectManager()->RenderBoneHierarchy(camera);
+    Engine::GetInstance().GetCameraManager()->CameraControllerForImGui();
 }
 
 void MeshesScene::RenderImGui()

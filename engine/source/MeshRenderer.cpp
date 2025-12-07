@@ -231,6 +231,23 @@ void MeshRenderer::CreateFromData(const std::vector<Vertex>& vertices, const std
     mesh->UploadToGPU();
 }
 
+void MeshRenderer::RebuildMesh()
+{
+    // 기존 메시 데이터 삭제 후 재생성
+    model = nullptr; // 모델 로드 모드 해제
+    mesh = std::make_unique<Mesh>(); // 새 메시 생성
+
+    switch (currentShape)
+    {
+    case MeshShape::Cube:     mesh->CreateCube(); break;
+    case MeshShape::Sphere:   mesh->CreateSphere(stacks, slices); break; // 파라미터 전달
+    case MeshShape::Cylinder: mesh->CreateCylinder(slices); break;       // 파라미터 전달
+    case MeshShape::Plane:    mesh->CreatePlane(); break;
+    }
+
+    mesh->UploadToGPU();
+}
+
 void MeshRenderer::LoadModel(const std::string& path, const std::string& customRootBoneName)
 {
     mesh = nullptr;

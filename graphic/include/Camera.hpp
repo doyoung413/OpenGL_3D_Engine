@@ -40,6 +40,8 @@ public:
 	float GetZoom() const { return zoom; }
 	float GetPitch() const { return pitch; }
 	float GetYaw() const { return yaw; }
+	float GetNear() const { return nearClip; }
+	float GetFar() const { return farClip; }
 	bool GetIsThirdPersonView() const { return isThirdPersonView; }
 
 	glm::vec3 GetFrontVector() const { return front; }

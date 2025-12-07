@@ -1,17 +1,13 @@
 #pragma once
-#include <memory>
-#include <string>
 #include "Scene.hpp"
+#include <memory>
 #include "Skybox.hpp"
 
-class Object;
-class Mesh;
-class Shader;
-class MeshesScene : public Scene
+class PBRScene : public Scene
 {
 public:
-    MeshesScene();         
-    virtual ~MeshesScene();
+    PBRScene();
+    virtual ~PBRScene();
 
     void Init() override;
     void Update(float dt) override;
@@ -21,6 +17,5 @@ public:
     void RenderImGui() override;
 
 private:
-    void HandleInputTests();
-    void HandleCameraInput(float dt);
+    std::unique_ptr<Skybox> skybox;
 };

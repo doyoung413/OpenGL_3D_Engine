@@ -143,7 +143,9 @@ copy "$(ProjectDir)\libs\Assimp\bin\Release\assimp-vc143-mt.dll" "$(OutDir)" </C
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="demo\source\GameScene.cpp" />
     <ClCompile Include="demo\source\MeshesScene.cpp" />
+    <ClCompile Include="demo\source\PBRScene.cpp" />
     <ClCompile Include="engine\source\AnimationStateMachine.cpp" />
     <ClCompile Include="engine\source\Animator.cpp" />
     <ClCompile Include="engine\source\CameraManager.cpp" />
@@ -175,7 +177,9 @@ copy "$(ProjectDir)\libs\Assimp\bin\Release\assimp-vc143-mt.dll" "$(OutDir)" </C
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="demo\include\GameScene.hpp" />
     <ClInclude Include="demo\include\MeshesScene.hpp" />
+    <ClInclude Include="demo\include\PBRScene.hpp" />
     <ClInclude Include="engine\include\AnimationStateMachine.hpp" />
     <ClInclude Include="engine\include\Animator.hpp" />
     <ClInclude Include="engine\include\CameraManager.hpp" />

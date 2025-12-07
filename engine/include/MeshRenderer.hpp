@@ -9,7 +9,8 @@ class Camera;
 class Model;
 class Light;
 
-enum class RenderMode { Fill, Wireframe };
+enum class RenderMode { Fill, Wireframe }; 
+enum class MeshShape { Cube, Sphere, Cylinder, Plane, None };
 
 class MeshRenderer : public Component
 {
@@ -29,6 +30,7 @@ public:
     void CreateCylinder();
     void CreateCapsule();
     void CreateFromData(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, PrimitivePattern pattern);
+    void RebuildMesh();
 
     void SetShader(const std::string& name);
     void SetShader(std::shared_ptr<Shader> shader_);
@@ -50,12 +52,24 @@ public:
     float GetRoughness() { return roughness; }
     void SetExposure(float exp) { exposure = exp; }
     float GetExposure() const { return exposure; }
+
+    void SetStacks(int amount) { stacks = amount; }
+    int GetStacks() const { return stacks; }
+    void SetSlices(int amount) { slices = amount; }
+    int GetSlices() const { return slices; }
+
+    void SetMeshShape(MeshShape shape) { currentShape = shape; }
+    MeshShape GetMeshShape() const { return currentShape; }
 private:
     std::shared_ptr<Model> model; // 모델 파일 로딩용
     std::unique_ptr<Mesh> mesh;   // CreateCube 등 절차적 생성용
     std::shared_ptr<Shader> shader;
     std::shared_ptr<Texture> texture;
     RenderMode renderMode = RenderMode::Fill;
+
+    MeshShape currentShape = MeshShape::None;
+    int stacks = 18;
+    int slices = 36;
 
     glm::vec4 color = glm::vec4(1.0f);
     float metallic = 0.5f;

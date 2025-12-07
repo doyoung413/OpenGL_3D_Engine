@@ -106,12 +106,12 @@ void Mesh::CreateCube()
     primitivePattern = PrimitivePattern::Triangles;
 }
 
-void Mesh::CreateSphere()
+void Mesh::CreateSphere(int stacks, int slices)
 {
     // 기본값 설정
     const float radius = 0.5f;
-    const int sectorCount = 36;
-    const int stackCount = 18;
+    const int sectorCount = slices;
+    const int stackCount = stacks;
 
     vertices.clear();
     indices.clear();
@@ -224,11 +224,11 @@ void Mesh::CreateDiamond()
     primitivePattern = PrimitivePattern::Triangles;
 }
 
-void Mesh::CreateCylinder()
+void Mesh::CreateCylinder(int segments_)
 {
     const float radius = 0.5f;
     const float height = 1.0f;
-    const int segments = 32;
+    const int segments = segments_;
 
     vertices.clear();
     indices.clear();

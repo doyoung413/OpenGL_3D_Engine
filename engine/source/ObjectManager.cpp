@@ -194,6 +194,37 @@ void ObjectManager::ObjectControllerForImgui()
 		{
 			if (ImGui::CollapsingHeader("Mesh Renderer", ImGuiTreeNodeFlags_DefaultOpen))
 			{
+				if (ImGui::CollapsingHeader("Mesh Generator", ImGuiTreeNodeFlags_DefaultOpen))
+				{
+					MeshRenderer* renderer = selectedObject->GetComponent<MeshRenderer>();
+
+					const char* shapes[] = { "Cube", "Sphere", "Cylinder", "Plane" };
+					int currentItem = static_cast<int>(renderer->GetMeshShape());
+					if (ImGui::Combo("Shape", &currentItem, shapes, IM_ARRAYSIZE(shapes)))
+					{
+						renderer->SetMeshShape(static_cast<MeshShape>(currentItem));
+						renderer->RebuildMesh();
+					}
+
+					if (renderer->GetMeshShape() == MeshShape::Sphere || renderer->GetMeshShape() == MeshShape::Cylinder)
+					{
+						int slices = renderer->GetSlices();
+						int stacks = renderer->GetStacks();
+
+						bool changed = false;
+						if (ImGui::SliderInt("Slices", &slices, 3, 64)) changed = true;
+						if (renderer->GetMeshShape() == MeshShape::Sphere)
+						{
+							if (ImGui::SliderInt("Stacks", &stacks, 2, 32)) changed = true;
+						}
+
+						renderer->SetStacks(stacks);
+						renderer->SetSlices(slices);
+
+						if (changed) renderer->RebuildMesh();
+					}
+				}
+
 				//if (!selectedObject)
 				{
 					MeshRenderer* renderer = selectedObject->GetComponent<MeshRenderer>();

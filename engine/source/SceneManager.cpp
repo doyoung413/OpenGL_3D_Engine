@@ -60,6 +60,39 @@ void SceneManager::ImGuiEndFrame()
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
+void SceneManager::RenderMainMenuBar()
+{
+    if (ImGui::BeginMainMenuBar())
+    {
+        if (ImGui::BeginMenu("Select Demo"))
+        {
+            if (ImGui::MenuItem("1. Meshes Demo"))
+            {
+                ChangeScene(SceneTag::MESHES);
+            }
+
+            if (ImGui::MenuItem("2. PBR"))
+            {
+                ChangeScene(SceneTag::PBR);
+            }
+
+            if (ImGui::MenuItem("3. Game Demo"))
+            {
+                ChangeScene(SceneTag::GAME);
+            }
+
+            ImGui::Separator();
+            if (ImGui::MenuItem("Exit"))
+            {
+                ChangeState(SceneState::SHUTDOWN);
+            }
+
+            ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+    }
+}
+
 
 void SceneManager::Update(float dt)
 {
@@ -96,6 +129,7 @@ void SceneManager::Update(float dt)
         else
         {
             ImGuiBeginFrame();
+            RenderMainMenuBar();
 
             ObjectManager* objectManager = Engine::GetInstance().GetObjectManager();
             RenderManager* renderManager = Engine::GetInstance().GetRenderManager();

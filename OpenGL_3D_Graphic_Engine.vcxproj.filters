@@ -129,6 +129,12 @@
     <ClCompile Include="graphic\source\Skybox.cpp">
       <Filter>Source Files\Graphic</Filter>
     </ClCompile>
+    <ClCompile Include="demo\source\GameScene.cpp">
+      <Filter>Source Files\Demo</Filter>
+    </ClCompile>
+    <ClCompile Include="demo\source\PBRScene.cpp">
+      <Filter>Source Files\Demo</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphic\include\IndexBuffer.hpp">
@@ -220,6 +226,12 @@
     </ClInclude>
     <ClInclude Include="graphic\include\Skybox.hpp">
       <Filter>Source Files\Graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="demo\include\GameScene.hpp">
+      <Filter>Source Files\Demo</Filter>
+    </ClInclude>
+    <ClInclude Include="demo\include\PBRScene.hpp">
+      <Filter>Source Files\Demo</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

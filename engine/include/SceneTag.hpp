@@ -3,5 +3,7 @@
 enum class SceneTag
 {
 	MESHES,
+	PBR,
+	GAME,
 	NONE
 };

@@ -31,6 +31,8 @@ public:
 private:
     void ImGuiBeginFrame();
     void ImGuiEndFrame();
+    void RenderMainMenuBar();
+
     // 씬 태그 순서대로 저장
     std::vector<Scene*> sceneList;
 

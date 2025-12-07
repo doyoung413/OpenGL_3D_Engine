@@ -14,13 +14,17 @@ public:
     void ClearCameras();
 
     int CreateCamera();
+    void DeleteCamera(int index);
     // 활성화할 메인 카메라를 설정
     void SetMainCamera(int index);
     // 현재 활성화된 메인 카메라 객체를 반환
     Camera* GetMainCamera();
     Camera* GetCamera(int index);
     const std::vector<std::unique_ptr<Camera>>& GetCameraList() const { return cameraList; }
+    
+    void CameraControllerForImGui();
 private:
     std::vector<std::unique_ptr<Camera>> cameraList;
     int mainCameraIndex = -1; // -1은 없음
+    int selectedCameraIndex = 0;
 };
