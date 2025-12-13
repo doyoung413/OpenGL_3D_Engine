@@ -66,19 +66,29 @@ void SceneManager::RenderMainMenuBar()
     {
         if (ImGui::BeginMenu("Select Demo"))
         {
-            if (ImGui::MenuItem("1. Meshes Demo"))
+            if (ImGui::MenuItem("Meshes Demo"))
             {
                 ChangeScene(SceneTag::MESHES);
             }
 
-            if (ImGui::MenuItem("2. PBR"))
+            if (ImGui::MenuItem("Animation Demo"))
+            {
+                ChangeScene(SceneTag::ANIMATION_DEMO);
+            }
+
+            if (ImGui::MenuItem("PBR"))
             {
                 ChangeScene(SceneTag::PBR);
             }
 
-            if (ImGui::MenuItem("3. Game Demo"))
+            if (ImGui::MenuItem("Game Demo"))
             {
                 ChangeScene(SceneTag::GAME);
+            }
+
+            if (ImGui::MenuItem("MoCap"))
+            {
+                ChangeScene(SceneTag::MOCAP);
             }
 
             ImGui::Separator();

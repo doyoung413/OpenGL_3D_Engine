@@ -58,7 +58,7 @@ void GameScene::Init()
         obj->AddComponent<Animator>();
         auto fsm = obj->AddComponent<AnimationStateMachine>();
 
-        fsm->AddState("Idle", "asset/models/Quad Punch.fbx");
+        fsm->AddState("Idle", "asset/models/Idle.fbx");
         fsm->AddState("Run", "asset/models/Walking_1.fbx");
         fsm->ChangeState("Idle");
 

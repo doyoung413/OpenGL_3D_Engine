@@ -65,6 +65,14 @@ void Skybox::PrecomputeIBL(const std::string& hdrPath)
     RenderManager* renderManager = Engine::GetInstance().GetRenderManager();
     Texture* hdrTexture = renderManager->GetTexture("hdr_temp").get();
 
+    // IBL 생성 중에는 블렌딩이 필요 없으므로 끕니다. (이전 씬의 렌더링 상태 간섭 방지)
+    glDisable(GL_BLEND);
+
+    // 캡처용 배경색을 검은색으로 설정 (혹시 모를 색 섞임 방지)
+    glm::vec4 oldClearColor;
+    glGetFloatv(GL_COLOR_CLEAR_VALUE, &oldClearColor.x); // 기존 배경색 저장
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // 검은색으로 설정
+
     // FBO, RBO 생성
     unsigned int captureFBO, captureRBO;
     glGenFramebuffers(1, &captureFBO);
@@ -213,6 +221,9 @@ void Skybox::PrecomputeIBL(const std::string& hdrPath)
     // 상태 복구
     glEnable(GL_CULL_FACE);
     glDepthFunc(GL_LESS);
+    
+    glClearColor(oldClearColor.r, oldClearColor.g, oldClearColor.b, oldClearColor.a);
+
     int w = Engine::GetInstance().GetWindowWidth();
     int h = Engine::GetInstance().GetWindowHeight();
     glViewport(0, 0, w, h);

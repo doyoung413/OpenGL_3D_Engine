@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="packages\Microsoft.ML.OnnxRuntime.DirectML.1.23.0\build\native\Microsoft.ML.OnnxRuntime.DirectML.props" Condition="Exists('packages\Microsoft.ML.OnnxRuntime.DirectML.1.23.0\build\native\Microsoft.ML.OnnxRuntime.DirectML.props')" />
+  <Import Project="packages\Microsoft.AI.DirectML.1.15.4\build\Microsoft.AI.DirectML.props" Condition="Exists('packages\Microsoft.AI.DirectML.1.15.4\build\Microsoft.AI.DirectML.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -103,20 +105,24 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)libs\SDL3\include;$(SolutionDir)libs\GLEW\include;$(SolutionDir)libs\GLM;$(SolutionDir)libs\STBI;$(SolutionDir)libs\Assimp\include;$(SolutionDir)libs\imgui;$(SolutionDir)libs\imgui\backends;$(SolutionDir)graphic\include;$(SolutionDir)engine\include;$(SolutionDir)demo\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libs\SDL3\include;$(SolutionDir)libs\GLEW\include;$(SolutionDir)libs\GLM;$(SolutionDir)libs\STBI;$(SolutionDir)libs\Assimp\include;$(SolutionDir)packages\Microsoft.ML.OnnxRuntime.DirectML.1.23.0\build\native\include;C:\opencv\build\include;$(SolutionDir)libs\imgui;$(SolutionDir)libs\imgui\backends;$(SolutionDir)graphic\include;$(SolutionDir)engine\include;$(SolutionDir)demo\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)libs\SDL3\lib\x64;$(SolutionDir)libs\GLEW\lib\x64;$(SolutionDir)libs\Assimp\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL3.lib
-;glew32.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)libs\SDL3\lib\x64;$(SolutionDir)libs\GLEW\lib\x64;C:\opencv\build\x64\vc16\lib;$(SolutionDir)libs\Assimp\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL3.lib;opencv_world4120d.lib;glew32.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>copy "$(ProjectDir)\libs\SDL3\lib\x64\SDL3.dll" "$(OutDir)" 
 copy "$(ProjectDir)\libs\GLEW\bin\Release\x64\glew32.dll" "$(OutDir)" 
 copy "$(ProjectDir)\libs\Assimp\bin\Debug\assimp-vc143-mtd.dll" "$(OutDir)" </Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>xcopy /y /d "C:\opencv\build\x64\vc16\bin\opencv_world4120d.dll" "$(OutDir)"
+xcopy /y /d "C:\opencv\build\x64\vc16\bin\opencv_videoio_ffmpeg4120_64.dll" "$(OutDir)"
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -127,24 +133,30 @@ copy "$(ProjectDir)\libs\Assimp\bin\Debug\assimp-vc143-mtd.dll" "$(OutDir)" </Co
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)libs\SDL3\include;$(SolutionDir)libs\GLEW\include;$(SolutionDir)libs\GLM;$(SolutionDir)libs\STBI;$(SolutionDir)libs\Assimp\include;$(SolutionDir)libs\imgui;$(SolutionDir)libs\imgui\backends;$(SolutionDir)graphic\include;$(SolutionDir)engine\include;$(SolutionDir)demo\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libs\SDL3\include;$(SolutionDir)libs\GLEW\include;$(SolutionDir)libs\GLM;$(SolutionDir)libs\STBI;$(SolutionDir)libs\Assimp\include;$(SolutionDir)packages\Microsoft.ML.OnnxRuntime.DirectML.1.23.0\build\native\include;C:\opencv\build\include;$(SolutionDir)libs\imgui;$(SolutionDir)libs\imgui\backends;$(SolutionDir)graphic\include;$(SolutionDir)engine\include;$(SolutionDir)demo\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)libs\SDL3\lib\x64;$(SolutionDir)libs\GLEW\lib\x64;$(SolutionDir)libs\Assimp\lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL3.lib
-;glew32.lib;assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)libs\SDL3\lib\x64;$(SolutionDir)libs\GLEW\lib\x64;C:\opencv\build\x64\vc16\lib;$(SolutionDir)libs\Assimp\lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL3.lib;opencv_world4120.lib;glew32.lib;assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>copy "$(ProjectDir)\libs\SDL3\lib\x64\SDL3.dll" "$(OutDir)" 
 copy "$(ProjectDir)\libs\GLEW\bin\Release\x64\glew32.dll" "$(OutDir)" 
 copy "$(ProjectDir)\libs\Assimp\bin\Release\assimp-vc143-mt.dll" "$(OutDir)" </Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>xcopy /y /d "C:\opencv\build\x64\vc16\bin\opencv_world4120.dll" "$(OutDir)"
+xcopy /y /d "C:\opencv\build\x64\vc16\bin\opencv_videoio_ffmpeg4120_64.dll" "$(OutDir)"
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="demo\source\AnimationDemoScene.cpp" />
     <ClCompile Include="demo\source\GameScene.cpp" />
     <ClCompile Include="demo\source\MeshesScene.cpp" />
+    <ClCompile Include="demo\source\MoCapScene.cpp" />
     <ClCompile Include="demo\source\PBRScene.cpp" />
     <ClCompile Include="engine\source\AnimationStateMachine.cpp" />
     <ClCompile Include="engine\source\Animator.cpp" />
@@ -152,10 +164,12 @@ copy "$(ProjectDir)\libs\Assimp\bin\Release\assimp-vc143-mt.dll" "$(OutDir)" </C
     <ClCompile Include="engine\source\Engine.cpp" />
     <ClCompile Include="engine\source\InputManager.cpp" />
     <ClCompile Include="engine\source\MeshRenderer.cpp" />
+    <ClCompile Include="engine\source\MotionCaptureSystem.cpp" />
     <ClCompile Include="engine\source\Object.cpp" />
     <ClCompile Include="engine\source\ObjectManager.cpp" />
     <ClCompile Include="engine\source\RenderManager.cpp" />
     <ClCompile Include="engine\source\SceneManager.cpp" />
+    <ClCompile Include="engine\source\ThreadManager.cpp" />
     <ClCompile Include="graphic\source\Animation.cpp" />
     <ClCompile Include="graphic\source\Bone.cpp" />
     <ClCompile Include="graphic\source\Camera.cpp" />
@@ -177,8 +191,10 @@ copy "$(ProjectDir)\libs\Assimp\bin\Release\assimp-vc143-mt.dll" "$(OutDir)" </C
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="demo\include\AnimationDemoScene.hpp" />
     <ClInclude Include="demo\include\GameScene.hpp" />
     <ClInclude Include="demo\include\MeshesScene.hpp" />
+    <ClInclude Include="demo\include\MoCapScene.hpp" />
     <ClInclude Include="demo\include\PBRScene.hpp" />
     <ClInclude Include="engine\include\AnimationStateMachine.hpp" />
     <ClInclude Include="engine\include\Animator.hpp" />
@@ -188,6 +204,7 @@ copy "$(ProjectDir)\libs\Assimp\bin\Release\assimp-vc143-mt.dll" "$(OutDir)" </C
     <ClInclude Include="engine\include\Engine.hpp" />
     <ClInclude Include="engine\include\InputManager.hpp" />
     <ClInclude Include="engine\include\MeshRenderer.hpp" />
+    <ClInclude Include="engine\include\MotionCaptureSystem.hpp" />
     <ClInclude Include="engine\include\Object.hpp" />
     <ClInclude Include="engine\include\ObjectManager.hpp" />
     <ClInclude Include="engine\include\ObjectType.hpp" />
@@ -195,6 +212,7 @@ copy "$(ProjectDir)\libs\Assimp\bin\Release\assimp-vc143-mt.dll" "$(OutDir)" </C
     <ClInclude Include="engine\include\Scene.hpp" />
     <ClInclude Include="engine\include\SceneManager.hpp" />
     <ClInclude Include="engine\include\SceneTag.hpp" />
+    <ClInclude Include="engine\include\ThreadManager.hpp" />
     <ClInclude Include="engine\include\Transform.hpp" />
     <ClInclude Include="graphic\include\Animation.hpp" />
     <ClInclude Include="graphic\include\Bone.hpp" />
@@ -210,7 +228,21 @@ copy "$(ProjectDir)\libs\Assimp\bin\Release\assimp-vc143-mt.dll" "$(OutDir)" </C
     <ClInclude Include="graphic\include\VertexBuffer.hpp" />
     <ClInclude Include="main.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="packages\Microsoft.AI.DirectML.1.15.4\build\Microsoft.AI.DirectML.targets" Condition="Exists('packages\Microsoft.AI.DirectML.1.15.4\build\Microsoft.AI.DirectML.targets')" />
+    <Import Project="packages\Microsoft.ML.OnnxRuntime.DirectML.1.23.0\build\native\Microsoft.ML.OnnxRuntime.DirectML.targets" Condition="Exists('packages\Microsoft.ML.OnnxRuntime.DirectML.1.23.0\build\native\Microsoft.ML.OnnxRuntime.DirectML.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\Microsoft.AI.DirectML.1.15.4\build\Microsoft.AI.DirectML.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.AI.DirectML.1.15.4\build\Microsoft.AI.DirectML.props'))" />
+    <Error Condition="!Exists('packages\Microsoft.AI.DirectML.1.15.4\build\Microsoft.AI.DirectML.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.AI.DirectML.1.15.4\build\Microsoft.AI.DirectML.targets'))" />
+    <Error Condition="!Exists('packages\Microsoft.ML.OnnxRuntime.DirectML.1.23.0\build\native\Microsoft.ML.OnnxRuntime.DirectML.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.ML.OnnxRuntime.DirectML.1.23.0\build\native\Microsoft.ML.OnnxRuntime.DirectML.props'))" />
+    <Error Condition="!Exists('packages\Microsoft.ML.OnnxRuntime.DirectML.1.23.0\build\native\Microsoft.ML.OnnxRuntime.DirectML.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.ML.OnnxRuntime.DirectML.1.23.0\build\native\Microsoft.ML.OnnxRuntime.DirectML.targets'))" />
+  </Target>
 </Project>

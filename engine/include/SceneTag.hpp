@@ -2,8 +2,10 @@
 
 enum class SceneTag
 {
-	MESHES,
+	MESHES, 
+	ANIMATION_DEMO,
 	PBR,
-	GAME,
+	GAME, 
+	MOCAP,
 	NONE
 };

@@ -7,6 +7,7 @@ class RenderManager;
 class InputManager;
 class SceneManager;
 class CameraManager;
+class ThreadManager;
 class Engine
 {
 public:
@@ -27,10 +28,12 @@ public:
     InputManager* GetInputManager() { return inputManager.get(); }
     SceneManager* GetSceneManager() { return sceneManager.get(); }
     CameraManager* GetCameraManager() { return cameraManager.get(); }
+    ThreadManager* GetThreadManager() { return threadManager.get(); }
 
     int GetWindowWidth() const { return windowWidth; }
     int GetWindowHeight() const { return windowHeight; }
 
+    void HandleWindowEvent(const SDL_WindowEvent& windowEvent);
     void ToggleFullscreen();
     void ToggleMSAA();
 private:
@@ -40,7 +43,6 @@ private:
     bool isFullscreen = false;
     bool isMSAAEnabled = false;
 
-    void HandleWindowEvent(const SDL_WindowEvent& windowEvent);
 
     SDL_Window* window = nullptr;
     SDL_GLContext context;
@@ -50,4 +52,5 @@ private:
     std::unique_ptr<InputManager> inputManager;
     std::unique_ptr<SceneManager> sceneManager;
     std::unique_ptr<CameraManager> cameraManager;
+    std::unique_ptr<ThreadManager> threadManager;
 };

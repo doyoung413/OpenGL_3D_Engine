@@ -4,6 +4,7 @@
 #include "InputManager.hpp"
 #include "SceneManager.hpp"
 #include "CameraManager.hpp"
+#include "ThreadManager.hpp"
 
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
@@ -25,6 +26,7 @@ void Engine::Init(int width_, int height_)
     inputManager = std::make_unique<InputManager>();
     sceneManager = std::make_unique<SceneManager>();
     cameraManager = std::make_unique<CameraManager>();
+    threadManager = std::make_unique<ThreadManager>();
 
     if (!SDL_Init(SDL_INIT_VIDEO)) 
     { 
@@ -99,6 +101,7 @@ void Engine::Init(int width_, int height_)
     glGetIntegerv(GL_SAMPLE_BUFFERS, &bufs);
     glGetIntegerv(GL_SAMPLES, &samples);
     std::cout << "[INFO] MSAA | Buffers: " << bufs << ", Samples: " << samples << std::endl;
+    threadManager->Start();
 }
 
 void Engine::Run()
@@ -108,42 +111,57 @@ void Engine::Run()
 
     while (isRunning)
     {
-        // 프레임 시작 시간 기록
+        //// 프레임 시작 시간 기록
+        //Uint64 startTicks = SDL_GetPerformanceCounter();
+        //SDL_Event event;
+
+        //while (SDL_PollEvent(&event))
+        //{
+        //    ImGui_ImplSDL3_ProcessEvent(&event);
+        //    switch (event.type)
+        //    {
+        //    case SDL_EVENT_QUIT:
+        //        isRunning = false;
+        //        break;
+        //    case SDL_EVENT_WINDOW_MOVED:
+        //    case SDL_EVENT_WINDOW_RESIZED:
+        //    case SDL_EVENT_WINDOW_MINIMIZED:
+        //    case SDL_EVENT_WINDOW_MAXIMIZED:
+        //    case SDL_EVENT_WINDOW_RESTORED:
+        //        HandleWindowEvent(event.window);
+        //        break;
+        //    }
+
+        //    inputManager->PollEvent(event);
+        //}
+
+        //// 로직 업데이트 및 렌더링
+        //sceneManager->Update(1.f / 60.f);
+        //inputManager->Update();
+
+        //// 프레임 종료 시간 기록 및 대기 
+        //Uint64 endTicks = SDL_GetPerformanceCounter();
+        //Uint64 elapsedTicks = endTicks - startTicks;
+
+        //// 1프레임을 처리하는 데 걸린 시간이 목표 시간보다 짧다면
+        //if (elapsedTicks < TICKS_PER_FRAME)
+        //{
+        //    // 남은 시간만큼 프로그램을 잠시 멈춤 (CPU 자원 낭비 방지)
+        //    Uint32 delayMs = (Uint32)(((TICKS_PER_FRAME - elapsedTicks) * 1000) / SDL_GetPerformanceFrequency());
+        //    SDL_Delay(delayMs);
+        //}
         Uint64 startTicks = SDL_GetPerformanceCounter();
-        SDL_Event event;
-
-        while (SDL_PollEvent(&event))
-        {
-            ImGui_ImplSDL3_ProcessEvent(&event);
-            switch (event.type)
-            {
-            case SDL_EVENT_QUIT:
-                isRunning = false;
-                break;
-            case SDL_EVENT_WINDOW_MOVED:
-            case SDL_EVENT_WINDOW_RESIZED:
-            case SDL_EVENT_WINDOW_MINIMIZED:
-            case SDL_EVENT_WINDOW_MAXIMIZED:
-            case SDL_EVENT_WINDOW_RESTORED:
-                HandleWindowEvent(event.window);
-                break;
-            }
-
-            inputManager->PollEvent(event);
-        }
+        threadManager->ProcessEvents();
 
         // 로직 업데이트 및 렌더링
         sceneManager->Update(1.f / 60.f);
         inputManager->Update();
 
-        // 프레임 종료 시간 기록 및 대기 
+        // 프레임 제한 로직 (기존 유지)
         Uint64 endTicks = SDL_GetPerformanceCounter();
         Uint64 elapsedTicks = endTicks - startTicks;
-
-        // 1프레임을 처리하는 데 걸린 시간이 목표 시간보다 짧다면
         if (elapsedTicks < TICKS_PER_FRAME)
         {
-            // 남은 시간만큼 프로그램을 잠시 멈춤 (CPU 자원 낭비 방지)
             Uint32 delayMs = (Uint32)(((TICKS_PER_FRAME - elapsedTicks) * 1000) / SDL_GetPerformanceFrequency());
             SDL_Delay(delayMs);
         }
@@ -152,6 +170,7 @@ void Engine::Run()
 
 void Engine::Shutdown()
 {
+    if (threadManager) threadManager->Stop();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();

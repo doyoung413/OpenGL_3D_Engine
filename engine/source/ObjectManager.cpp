@@ -96,6 +96,7 @@ void ObjectManager::DestroyAllObjects()
 	}
 	removalQueue.clear();
 	objects.clear();
+	selectedObject = nullptr;
 }
 
 void ObjectManager::ProcessQueues()

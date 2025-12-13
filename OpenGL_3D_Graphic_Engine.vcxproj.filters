@@ -37,6 +37,9 @@
     <Filter Include="Source Files\Engine\Imgui">
       <UniqueIdentifier>{f15b819a-ef34-47a1-b24b-75e10fe3a9ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Engine\MotionCapture">
+      <UniqueIdentifier>{85126f7f-67d9-4ee9-ade5-b928a477179c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -133,6 +136,12 @@
       <Filter>Source Files\Demo</Filter>
     </ClCompile>
     <ClCompile Include="demo\source\PBRScene.cpp">
+      <Filter>Source Files\Demo</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\source\MotionCaptureSystem.cpp">
+      <Filter>Source Files\Engine\MotionCapture</Filter>
+    </ClCompile>
+    <ClCompile Include="demo\source\MoCapScene.cpp">
       <Filter>Source Files\Demo</Filter>
     </ClCompile>
   </ItemGroup>
@@ -233,5 +242,16 @@
     <ClInclude Include="demo\include\PBRScene.hpp">
       <Filter>Source Files\Demo</Filter>
     </ClInclude>
+    <ClInclude Include="engine\include\MotionCaptureSystem.hpp">
+      <Filter>Source Files\Engine\MotionCapture</Filter>
+    </ClInclude>
+    <ClInclude Include="demo\include\MoCapScene.hpp">
+      <Filter>Source Files\Demo</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="$(MSBuildThisFileDirectory)..\..\runtimes\win-x64\native\onnxruntime.dll" />
+    <None Include="$(MSBuildThisFileDirectory)..\..\runtimes\win-x64\native\onnxruntime_providers_shared.dll" />
   </ItemGroup>
 </Project>
