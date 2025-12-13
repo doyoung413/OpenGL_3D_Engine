@@ -59,11 +59,8 @@ Visual Studio에서 프로젝트를 열고 다음 단계를 수행하세요.
 
 ### 2. OpenCV 설정 및 DLL 배치
 OpenCV는 용량 문제로 저장소에 포함되지 않았으므로 별도 다운로드가 필요합니다.
-1.  [OpenCV 공식 릴리즈 페이지](https://opencv.org/releases/)에서 Windows 버전(4.x 이상)을 다운로드하여 설치합니다.
-2.  **실행을 위해 필수적인 DLL 파일**들을 프로젝트의 실행 파일이 생성되는 폴더(`x64/Debug` 또는 `x64/Release`) 혹은 프로젝트 루트 폴더에 복사해야 합니다.
-    * **필수 파일 1**: `opencv_world4xx.dll` (설치된 버전에 맞는 파일)
-    * **필수 파일 2**: `opencv_videoio_ffmpeg4xx_64.dll` (비디오 파일 재생을 위한 코덱)
-    * *위치 예시: `C:\opencv\build\x64\vc16\bin` 내부*
+[OpenCV 공식 릴리즈 페이지](https://opencv.org/releases/)에서 Windows 버전(4.x 이상)을 다운로드하여 설치합니다.
+
 
 ### 3. 빌드 및 실행
 1.  Visual Studio 2022에서 `.sln` 파일을 엽니다.
