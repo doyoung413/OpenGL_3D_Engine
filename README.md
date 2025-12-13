@@ -1,4 +1,4 @@
-# 🎮 OpenGL 3D Game Engine & AI Motion Capture
+# OpenGL 3D Game Engine & AI Motion Capture
 > **도전학기 15주 프로젝트: 자체 제작 3D 그래픽스 엔진 및 AI 모션 캡처 시스템**
 
 이 프로젝트는 C++와 OpenGL 4.3+을 기반으로 바닥부터 직접 구현한 **3D 그래픽스 엔진**입니다.
@@ -6,7 +6,7 @@
 
 ---
 
-## ✨ 주요 기능 (Key Features)
+## 주요 기능 (Key Features)
 
 ### 1. Core Engine Architecture
 - **Component-Based System**: Unity와 유사한 컴포넌트 기반 객체 관리 (`MeshRenderer`, `Animator`, `Light` 등).
@@ -99,14 +99,10 @@ OpenCV는 용량 문제로 저장소에 포함되지 않았으므로 별도 다�
 
 ---
 
-## 📝 주차별 개발 요약 (15주차 완료)
+## 주차별 개발 요약 (15주차 완료)
 
 * **1~4주차**: SDL3 윈도우 생성, 렌더링 파이프라인 구축, 카메라 시스템.
 * **5~8주차**: Assimp 모델 로딩, 퐁 조명, 스켈레탈 애니메이션 데이터 파싱.
 * **9~12주차**: GPU 스키닝, PBR(Cook-Torrance) 구현, IBL 환경맵 생성.
 * **13~15주차**: AI 모션 캡처(BlazePose) 연동, 애니메이션 FSM 고도화, 최종 데모 씬 통합 및 최적화.
 
----
-
-## 👨‍💻 Author
-* **이도영 (Yeungnam Univ. CSE)**
