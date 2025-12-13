@@ -33,7 +33,7 @@
 
 ---
 
-## 🛠️ 개발 환경 (Tech Stack)
+## 개발 환경 (Tech Stack)
 
 * **Language**: C++ (Visual Studio 2022)
 * **Graphics API**: OpenGL 4.3+
