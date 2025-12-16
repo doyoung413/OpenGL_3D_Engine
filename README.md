@@ -55,11 +55,11 @@
 Visual Studio에서 프로젝트를 열고 다음 단계를 수행하세요.
 1.  **솔루션 탐색기** -> 프로젝트 우클릭 -> **NuGet 패키지 관리(Manage NuGet Packages)...** 선택.
 2.  **`Microsoft.ML.OnnxRuntime`** 검색 후 설치.
-3.  (선택 사항) GPU 가속이 필요한 경우 `Microsoft.ML.OnnxRuntime.Gpu`를 설치합니다 (기본 CPU 버전으로도 정상 작동함).
+3.  (선택 사항) GPU 가속이 필요한 경우 `Microsoft.ML.OnnxRuntime.DirectML`를 설치합니다 (기본 CPU 버전으로도 정상 작동함).
 
 ### 2. OpenCV 설정 및 DLL 배치
 OpenCV는 용량 문제로 저장소에 포함되지 않았으므로 별도 다운로드가 필요합니다.
-[OpenCV 공식 릴리즈 페이지](https://opencv.org/releases/)에서 Windows 버전(4.x 이상)을 다운로드하여 설치합니다.
+[OpenCV 공식 릴리즈 페이지](https://opencv.org/releases/)에서 Windows 버전(OpenCV 4.1.2 (vc15/vc16))을 다운로드하여 설치합니다.
 
 
 ### 3. 빌드 및 실행
