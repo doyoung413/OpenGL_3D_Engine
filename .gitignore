@@ -420,3 +420,9 @@ FodyWeavers.xsd
 # .dll(not ignore)
 !libs/**
 !libs/**/x64/
+
+# .obj(not ignore)
+!**/Assets/**/*.obj
+!**/Resources/**/*.obj
+!**/Models/**/*.obj
+!**/objects/**/*.obj
