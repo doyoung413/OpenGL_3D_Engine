@@ -59,7 +59,7 @@ Visual Studio에서 프로젝트를 열고 다음 단계를 수행하세요.
 
 ### 2. OpenCV 설정 및 DLL 배치
 OpenCV는 용량 문제로 저장소에 포함되지 않았으므로 별도 다운로드가 필요합니다.
-[OpenCV 공식 릴리즈 페이지](https://opencv.org/releases/)에서 Windows 버전(OpenCV 4.1.2 (vc15/vc16))을 다운로드하여 설치합니다.
+[OpenCV 공식 릴리즈 페이지](https://opencv.org/releases/)에서 Windows 버전(OpenCV 4.12.0 (vc15/vc16))을 다운로드하여 설치합니다.
 
 
 ### 3. 빌드 및 실행
