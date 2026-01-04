@@ -10,7 +10,25 @@ Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath)
 {
     std::string vertexSource = ReadFile(vertexPath);
     std::string fragmentSource = ReadFile(fragmentPath);
+    
+    if (vertexSource.empty())
+    {
+        std::cerr << "버텍스 셰이더 파일을 읽지 못했습니다!" << std::endl;
+        return;
+    }
+    else if (fragmentSource.empty())
+    {
+        std::cerr << "프레그먼트 셰이더 파일을 읽지 못했습니다!" << std::endl;
+        return;
+    }
+
     rendererID = CreateProgram(vertexSource, fragmentSource);
+    
+    if (rendererID == 0)
+    {
+        std::cerr << "셰이더 프로그램 생성에 실패했습니다!" << std::endl;
+        return;
+    }
 
     // 셰이더 리플렉션: 모든 활성 유니폼 변수의 목록을 가져와 저장
     GLint numActiveUniforms = 0;
@@ -107,10 +125,68 @@ unsigned int Shader::CreateProgram(const std::string& vertexShader, const std::s
     unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
     unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
 
+    if (vs == 0 || fs == 0)
+    {
+        if (vs == 0)
+        {
+            std::cerr << "버텍스 셰이더 컴파일을 실패했습니다!" << std::endl;
+        }
+        if (fs == 0)
+        {
+            std::cerr << "프래그먼트 셰이더 컴파일을 실패했습니다!" << std::endl;
+        }
+
+        glDeleteProgram(program);
+        if (vs != 0) 
+        {
+            glDeleteShader(vs);
+        }
+        if (fs != 0) 
+        {
+            glDeleteShader(fs);
+        }
+        return 0;
+    }
+
     glAttachShader(program, vs);
     glAttachShader(program, fs);
     glLinkProgram(program);
+
+    int linkStatus;
+    glGetProgramiv(program, GL_LINK_STATUS, &linkStatus);
+    if (linkStatus == GL_FALSE)
+    {
+        int length;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
+        if (length > 0)
+        {
+            std::vector<char> message(length);
+            glGetProgramInfoLog(program, length, nullptr, &message[0]);
+            std::cerr << "셰이더 프로그램 링크에 실패했습니다!" << std::endl;
+            std::cerr << message.data() << std::endl;
+        }
+        glDeleteProgram(program);
+        glDeleteShader(vs);
+        glDeleteShader(fs);
+        return 0;
+    }
+
     glValidateProgram(program);
+
+    int validateStatus;
+    glGetProgramiv(program, GL_VALIDATE_STATUS, &validateStatus);
+    if (validateStatus == GL_FALSE)
+    {
+        int length;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
+        if (length > 0)
+        {
+            std::vector<char> message(length);
+            glGetProgramInfoLog(program, length, nullptr, &message[0]);
+            std::cerr << "셰이더 프로그램 유효성 검사를 실패했습니다!" << std::endl;
+            std::cerr << message.data() << std::endl;
+        }
+    }
 
     glDeleteShader(vs);
     glDeleteShader(fs);
@@ -135,7 +211,9 @@ int Shader::GetUniformLocation(const std::string& name)
 
     int location = glGetUniformLocation(rendererID, name.c_str());
     if (location == -1)
-        std::cout << "경고: Uniform '" << name << "'을(를) 찾을 수 없습니다." << std::endl;
+    {
+        std::cout << "Uniform '" << name << "'을(를) 찾을 수 없습니다." << std::endl;
+    }
 
     uniformLocationCache[name] = location;
     return location;

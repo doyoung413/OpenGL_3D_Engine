@@ -1,6 +1,6 @@
 #version 430 core
 
-const int MAX_BONES = 256;
+const int MAX_BONES = 128;
 uniform mat4 finalBonesMatrices[MAX_BONES];
 
 layout (location = 0) in vec3 aPos;

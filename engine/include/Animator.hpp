@@ -99,4 +99,6 @@ private:
     RootMotionBakeOptions bakeOptions;
     glm::mat4 rootMotionStartTransform = glm::mat4(1.0f); 
     glm::mat4 previousRootMotionStartTransform = glm::mat4(1.0f);
+
+    const int maxBones = 128;
 };

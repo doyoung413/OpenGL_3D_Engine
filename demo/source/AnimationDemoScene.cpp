@@ -166,6 +166,8 @@ void AnimationDemoScene::HandleCameraInput(float dt)
     if (input->IsKeyPressed(KEYBOARDKEYS::S)) mainCamera->MoveCameraPos(CameraMoveDir::BACKWARD, cameraSpeed);
     if (input->IsKeyPressed(KEYBOARDKEYS::A)) mainCamera->MoveCameraPos(CameraMoveDir::LEFT, cameraSpeed);
     if (input->IsKeyPressed(KEYBOARDKEYS::D)) mainCamera->MoveCameraPos(CameraMoveDir::RIGHT, cameraSpeed);
+    if (input->IsKeyPressed(KEYBOARDKEYS::SPACE)) mainCamera->MoveCameraPos(CameraMoveDir::UP, cameraSpeed);
+    if (input->IsKeyPressed(KEYBOARDKEYS::LSHIFT)) mainCamera->MoveCameraPos(CameraMoveDir::DOWN, cameraSpeed);
 
     // 마우스 우클릭 시에만 회전하도록 설정 (편의성)
     if (input->IsMouseButtonPressed(MOUSEBUTTON::RIGHT))

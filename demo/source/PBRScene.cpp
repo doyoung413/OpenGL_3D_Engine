@@ -108,10 +108,10 @@ void PBRScene::Update(float dt)
         if (input->IsKeyPressed(KEYBOARDKEYS::S)) mainCam->MoveCameraPos(CameraMoveDir::BACKWARD, speed);
         if (input->IsKeyPressed(KEYBOARDKEYS::A)) mainCam->MoveCameraPos(CameraMoveDir::LEFT, speed);
         if (input->IsKeyPressed(KEYBOARDKEYS::D)) mainCam->MoveCameraPos(CameraMoveDir::RIGHT, speed);
+        if (input->IsKeyPressed(KEYBOARDKEYS::SPACE)) mainCam->MoveCameraPos(CameraMoveDir::UP, speed);
+        if (input->IsKeyPressed(KEYBOARDKEYS::LSHIFT)) mainCam->MoveCameraPos(CameraMoveDir::DOWN, speed);
 
-        if (input->GetRelativeMouseMode()) {
-            mainCam->UpdateCameraDirection(input->GetRelativeMouseMotion());
-        }
+        if (input->GetRelativeMouseMode()) mainCam->UpdateCameraDirection(input->GetRelativeMouseMotion());
 
         if (input->IsMouseButtonPressOnce(MOUSEBUTTON::RIGHT)) input->SetRelativeMouseMode(true);
         if (input->IsMouseButtonReleasedOnce(MOUSEBUTTON::RIGHT)) input->SetRelativeMouseMode(false);

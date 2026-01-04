@@ -8,10 +8,10 @@ public:
 	template <typename T, auto N = std::dynamic_extent>
 	VertexBuffer(std::span<T, N> data, size_t size_)
 	{
-		size = size_;
 		glCreateBuffers(1, &bufferHandle);
 		glNamedBufferStorage(bufferHandle, size_, nullptr, GL_DYNAMIC_STORAGE_BIT);
-		glNamedBufferSubData(bufferHandle, 0, size, data.data());
+		glNamedBufferSubData(bufferHandle, 0, size_, data.data());  // ก็ Now correctly uses size_!
+		size = size_;
 	}
 	~VertexBuffer();
 

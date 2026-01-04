@@ -62,7 +62,7 @@ void MeshesScene::Init()
         object->SetName("Sphere");
         auto renderer = object->AddComponent<MeshRenderer>();
         renderer->CreateSphere();
-        renderer->SetShader("pbr"); // "basic" -> "pbr"
+        renderer->SetShader("basic");
         renderer->SetColor({ 0.8f, 0.8f, 1.0f, 1.0f });
         object->transform.SetPosition(-1.5f, 0.0f, 0.0f);
     });

@@ -11,14 +11,15 @@
 #include "Engine.hpp" 
 #include "ObjectManager.hpp" 
 
-
 Animator::Animator()
 	: Component(ComponentTypes::ANIMATOR),
 	currentTime(0.0f)
 {
-	finalBoneMatrices.reserve(256);
-	for (int i = 0; i < 256; i++)
+	finalBoneMatrices.reserve(maxBones);
+	for (int i = 0; i < maxBones; i++)
+	{
 		finalBoneMatrices.push_back(glm::mat4(1.0f));
+	}
 }
 
 void Animator::Init() {}

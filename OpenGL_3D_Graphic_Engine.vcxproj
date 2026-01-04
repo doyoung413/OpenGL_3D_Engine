@@ -226,7 +226,6 @@ xcopy /y /d "C:\opencv\build\x64\vc16\bin\opencv_videoio_ffmpeg4120_64.dll" "$(O
     <ClInclude Include="graphic\include\Texture.hpp" />
     <ClInclude Include="graphic\include\VertexArray.hpp" />
     <ClInclude Include="graphic\include\VertexBuffer.hpp" />
-    <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

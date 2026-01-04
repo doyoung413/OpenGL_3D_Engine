@@ -144,6 +144,12 @@
     <ClCompile Include="demo\source\MoCapScene.cpp">
       <Filter>Source Files\Demo</Filter>
     </ClCompile>
+    <ClCompile Include="demo\source\AnimationDemoScene.cpp">
+      <Filter>Source Files\Demo</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\source\ThreadManager.cpp">
+      <Filter>Source Files\Engine\Managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphic\include\IndexBuffer.hpp">
@@ -178,9 +184,6 @@
     </ClInclude>
     <ClInclude Include="graphic\include\Mesh.hpp">
       <Filter>Source Files\Graphic</Filter>
-    </ClInclude>
-    <ClInclude Include="main.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\include\SceneTag.hpp">
       <Filter>Source Files\Engine\Scene</Filter>
@@ -247,6 +250,12 @@
     </ClInclude>
     <ClInclude Include="demo\include\MoCapScene.hpp">
       <Filter>Source Files\Demo</Filter>
+    </ClInclude>
+    <ClInclude Include="demo\include\AnimationDemoScene.hpp">
+      <Filter>Source Files\Demo</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\include\ThreadManager.hpp">
+      <Filter>Source Files\Engine\Managers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

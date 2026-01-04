@@ -15,7 +15,7 @@ uniform vec3 viewPos;
 uniform bool isPointLight;
 
 // Material
-uniform sampler2D Texture; 
+layout(binding = 0) uniform sampler2D Texture; 
 uniform bool useTexture;
 uniform vec4 color;
 uniform float metallic;
@@ -23,9 +23,11 @@ uniform float roughness;
 uniform float exposure;
 
 // 간접 조명 맵
-uniform samplerCube irradianceMap; // 확산광용 (Diffuse)
-uniform samplerCube prefilterMap;  // 반사광용 (Specular)
-uniform sampler2D brdfLUT;         // BRDF 조화 테이블
+layout(binding = 1) uniform samplerCube irradianceMap; // 확산광용 (Diffuse)
+layout(binding = 2) uniform samplerCube prefilterMap; // 반사광용 (Specular)
+
+// 반사광용 (Specular)
+layout(binding = 3) uniform sampler2D brdfLUT;         // BRDF 조화 테이블
 
 const float PI = 3.14159265359;
 
@@ -161,7 +163,7 @@ void main()
     vec2 brdf  = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
     
     // 3. 최종 IBL Specular 공식 적용
-    vec3 specular = prefilteredColor * (F_IBL * brdf.x + brdf.y);
+    vec3 specular = prefilteredColor * (F0 * brdf.x + brdf.y);
 
     // 간접광 = Diffuse + Specular
     vec3 ambient = (kD_IBL * diffuse + specular); // AO는 일단 1.0 처리
